@@ -8,6 +8,7 @@ import {
   saveThemePreference,
   type ThemePreference,
 } from "../lib/theme";
+import { readLastTenantSlug, rememberLastTenantSlug } from "../lib/tenantContext";
 
 type BreadcrumbItem = {
   label: string;
@@ -54,12 +55,15 @@ function isActivePath(
 }
 
 function getTenantScopedNavItem(pathname: string) {
-  const matched = pathname.match(/^\/t\/([^/]+)(?:\/|$)/);
-  if (!matched) {
+  const tenantSlug = getTenantSlugFromPath(pathname);
+  if (!tenantSlug) {
     return null;
   }
 
-  const tenantSlug = matched[1];
+  return buildTenantNavItem(tenantSlug);
+}
+
+function buildTenantNavItem(tenantSlug: string) {
   return {
     label: "会客厅",
     to: `/t/${tenantSlug}/lounge`,
@@ -69,6 +73,11 @@ function getTenantScopedNavItem(pathname: string) {
       `/t/${tenantSlug}/admin`,
     ] as const,
   };
+}
+
+function getTenantSlugFromPath(pathname: string) {
+  const matched = pathname.match(/^\/t\/([^/]+)(?:\/|$)/);
+  return matched?.[1] ?? null;
 }
 
 export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
@@ -85,7 +94,9 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const adminEntry = isAdminLoggedIn
     ? { label: "管理员", to: "/admin/feedbacks" }
     : getAdminEntryLink();
-  const tenantNavItem = getTenantScopedNavItem(location.pathname);
+  const currentTenantNavItem = getTenantScopedNavItem(location.pathname);
+  const rememberedTenantSlug = currentTenantNavItem ? null : readLastTenantSlug();
+  const tenantNavItem = currentTenantNavItem ?? (rememberedTenantSlug ? buildTenantNavItem(rememberedTenantSlug) : null);
   const navItems = [
     BASE_NAV_ITEMS[0],
     ...(tenantNavItem ? [tenantNavItem] : []),
@@ -115,6 +126,15 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
       mediaQuery.removeEventListener("change", handleChange);
     };
   }, [themePreference]);
+
+  useEffect(() => {
+    if (currentTenantNavItem) {
+      const tenantSlug = getTenantSlugFromPath(location.pathname);
+      if (tenantSlug) {
+        rememberLastTenantSlug(tenantSlug);
+      }
+    }
+  }, [currentTenantNavItem, location.pathname]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {

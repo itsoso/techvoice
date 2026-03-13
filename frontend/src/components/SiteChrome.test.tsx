@@ -1,6 +1,6 @@
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 
 import SiteChrome from "./SiteChrome";
 import { clearAdminToken, setAdminToken } from "../api/admin";
@@ -114,4 +114,41 @@ it("shows a tenant lounge entry when browsing tenant-scoped pages", () => {
   expect(screen.getByRole("link", { name: "会客厅" })).toHaveAttribute("href", "/t/kuaishou/lounge");
   const navLinks = screen.getAllByRole("link").map((element) => element.textContent);
   expect(navLinks.indexOf("会客厅")).toBeLessThan(navLinks.indexOf("我要吐槽"));
+});
+
+it("keeps the tenant lounge entry visible on global pages after a tenant has been remembered", () => {
+  mockMatchMedia(true);
+  localStorage.setItem("techvoice-last-tenant-slug", "kuaishou");
+
+  render(
+    <MemoryRouter initialEntries={["/wall"]}>
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "回音壁" },
+        ]}
+      />
+    </MemoryRouter>,
+  );
+
+  expect(screen.getByRole("link", { name: "会客厅" })).toHaveAttribute("href", "/t/kuaishou/lounge");
+});
+
+it("remembers the current tenant slug when browsing a tenant-scoped page", async () => {
+  mockMatchMedia(true);
+
+  render(
+    <MemoryRouter initialEntries={["/t/kuaishou/lounge"]}>
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "限时匿名会客厅" },
+        ]}
+      />
+    </MemoryRouter>,
+  );
+
+  await waitFor(() => {
+    expect(localStorage.getItem("techvoice-last-tenant-slug")).toBe("kuaishou");
+  });
 });
