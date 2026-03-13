@@ -93,6 +93,9 @@ a {
   flex-direction: column;
   gap: 14px;
   margin-bottom: 24px;
+  position: relative;
+  z-index: 30;
+  isolation: isolate;
 }
 
 .site-nav-row {
@@ -106,6 +109,9 @@ a {
   background: linear-gradient(180deg, var(--nav-surface-top), var(--nav-surface-bottom));
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow);
+  position: relative;
+  z-index: 2;
+  overflow: visible;
 }
 
 .site-brand {
@@ -161,6 +167,7 @@ a {
 
 .display-menu-shell {
   position: relative;
+  z-index: 4;
 }
 
 .display-menu-trigger {
@@ -210,7 +217,7 @@ a {
   background: linear-gradient(180deg, var(--panel-surface-top), var(--panel));
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow);
-  z-index: 20;
+  z-index: 60;
 }
 
 .display-menu-group {
