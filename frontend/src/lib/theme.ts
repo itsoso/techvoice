@@ -5,7 +5,7 @@ export type ResolvedTheme = "light" | "dark";
 
 export function readThemePreference(): ThemePreference {
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
+  return stored === "light" || stored === "dark" || stored === "system" ? stored : "dark";
 }
 
 export function saveThemePreference(preference: ThemePreference) {

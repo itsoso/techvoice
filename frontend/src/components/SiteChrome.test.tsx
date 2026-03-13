@@ -38,12 +38,13 @@ it("renders primary navigation and breadcrumbs", () => {
   expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "我要吐槽" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "管理员登录" })).toHaveAttribute("href", "/admin/login");
-  expect(screen.getByRole("link", { name: "系统架构" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /显示/i })).toHaveTextContent("深色");
+  expect(screen.queryByRole("link", { name: "系统架构" })).not.toBeInTheDocument();
   expect(screen.getByRole("navigation", { name: "面包屑" })).toBeInTheDocument();
   expect(screen.getByRole("navigation", { name: "面包屑" })).toHaveTextContent("查询追踪");
 });
 
-it("lets visitors switch theme from the compact theme selector", async () => {
+it("opens the display menu for theme changes and architecture navigation", async () => {
   mockMatchMedia(true);
   const user = userEvent.setup();
 
@@ -58,7 +59,11 @@ it("lets visitors switch theme from the compact theme selector", async () => {
     </MemoryRouter>,
   );
 
-  await user.selectOptions(screen.getByRole("combobox", { name: "主题模式" }), "light");
+  await user.click(screen.getByRole("button", { name: /显示/i }));
+  expect(screen.getByRole("menu")).toBeInTheDocument();
+  expect(screen.getByRole("menuitem", { name: "系统架构" })).toHaveAttribute("href", "/architecture");
+
+  await user.click(screen.getByRole("menuitemradio", { name: "浅色" }));
 
   expect(document.documentElement.dataset.theme).toBe("light");
   expect(localStorage.getItem("techvoice-theme-preference")).toBe("light");

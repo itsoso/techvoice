@@ -23,8 +23,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it("defaults to system when there is no saved preference", () => {
-  expect(readThemePreference()).toBe("system");
+it("defaults to dark when there is no saved preference", () => {
+  expect(readThemePreference()).toBe("dark");
 });
 
 it("resolves system theme from the current media query", () => {

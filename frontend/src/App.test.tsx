@@ -21,6 +21,9 @@ it("renders the public architecture page", () => {
 
   expect(screen.getByRole("heading", { level: 1, name: "系统架构" })).toBeInTheDocument();
   expect(screen.getByRole("region", { name: "代码行数快照" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 2, name: "数据库表结构" })).toBeInTheDocument();
+  expect(screen.getByText("feedbacks")).toBeInTheDocument();
+  expect(screen.getByText("feedback_events")).toBeInTheDocument();
 });
 
 it("redirects expired admin sessions back to the login page", async () => {

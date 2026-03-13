@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { getAdminEntryLink } from "../api/admin";
@@ -32,6 +32,12 @@ const THEME_OPTIONS: Array<{ label: string; value: ThemePreference }> = [
   { label: "深色", value: "dark" },
 ];
 
+const THEME_LABELS: Record<ThemePreference, string> = {
+  system: "跟随系统",
+  light: "浅色",
+  dark: "深色",
+};
+
 function isActivePath(
   pathname: string,
   item: { to: string; exact?: boolean; prefixes?: readonly string[] },
@@ -50,6 +56,8 @@ function isActivePath(
 export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const location = useLocation();
   const [themePreference, setThemePreference] = useState<ThemePreference>(() => readThemePreference());
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const isArchitecturePage =
     location.pathname === "/architecture" || location.pathname.startsWith("/architecture/");
   const adminEntry = getAdminEntryLink();
@@ -61,6 +69,7 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
       prefixes: ["/admin"],
     },
   ] as const;
+  const displayLabel = useMemo(() => THEME_LABELS[themePreference], [themePreference]);
 
   useEffect(() => {
     applyThemePreference(themePreference);
@@ -80,10 +89,32 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
     };
   }, [themePreference]);
 
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
   function handleThemeChange(nextPreference: ThemePreference) {
     saveThemePreference(nextPreference);
     setThemePreference(nextPreference);
     applyThemePreference(nextPreference);
+    setMenuOpen(false);
   }
 
   return (
@@ -105,27 +136,54 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
             ))}
           </nav>
           <div className="site-utility-row">
-            <Link
-              className={`site-utility-link${isArchitecturePage ? " site-utility-link-active" : ""}`}
-              to="/architecture"
-            >
-              系统架构
-            </Link>
-            <label className="theme-select-shell">
-              <span className="theme-select-label">显示</span>
-              <select
-                aria-label="主题模式"
-                className="theme-select"
-                onChange={(event) => handleThemeChange(event.target.value as ThemePreference)}
-                value={themePreference}
+            <div className="display-menu-shell" ref={menuRef}>
+              <button
+                aria-expanded={menuOpen}
+                aria-haspopup="menu"
+                className={`display-menu-trigger${menuOpen ? " display-menu-trigger-open" : ""}`}
+                onClick={() => setMenuOpen((current) => !current)}
+                type="button"
               >
-                {THEME_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                <span className="display-menu-kicker">显示</span>
+                <strong>{displayLabel}</strong>
+              </button>
+
+              {menuOpen ? (
+                <div aria-label="显示菜单" className="display-menu-popover" role="menu">
+                  <div className="display-menu-group">
+                    <p className="display-menu-group-label">主题</p>
+                    {THEME_OPTIONS.map((option) => (
+                      <button
+                        aria-checked={themePreference === option.value}
+                        className={`display-menu-item${
+                          themePreference === option.value ? " display-menu-item-active" : ""
+                        }`}
+                        key={option.value}
+                        onClick={() => handleThemeChange(option.value)}
+                        role="menuitemradio"
+                        type="button"
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="display-menu-divider" />
+
+                  <div className="display-menu-group">
+                    <p className="display-menu-group-label">说明</p>
+                    <Link
+                      className={`display-menu-link${isArchitecturePage ? " display-menu-link-active" : ""}`}
+                      onClick={() => setMenuOpen(false)}
+                      role="menuitem"
+                      to="/architecture"
+                    >
+                      系统架构
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
