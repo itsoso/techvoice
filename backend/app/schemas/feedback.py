@@ -118,6 +118,11 @@ class PublicAdminReplyRead(BaseModel):
     created_at: datetime
 
 
+class PublicEmployeeReplyRead(BaseModel):
+    content: str
+    created_at: datetime
+
+
 class PublicFeedbackRead(BaseModel):
     public_code: str
     type: FeedbackType
@@ -129,6 +134,7 @@ class PublicFeedbackRead(BaseModel):
     proposal_impact: str | None
     proposal_suggestion: str | None
     admin_replies: list[PublicAdminReplyRead]
+    employee_replies: list[PublicEmployeeReplyRead]
     star_count: int
     created_at: datetime
 

@@ -58,6 +58,12 @@ it("renders full proposal content and admin replies on the public wall", async (
                 created_at: "2026-03-13T10:00:00Z",
               },
             ],
+            employee_replies: [
+              {
+                content: "补充一下，主要堵点出在跨团队联调。",
+                created_at: "2026-03-13T11:00:00Z",
+              },
+            ],
             star_count: 4,
             created_at: "2026-03-13T00:00:00Z",
           },
@@ -80,4 +86,6 @@ it("renders full proposal content and admin replies on the public wall", async (
   expect(screen.getByText("统一在周三冻结需求并提前一天确认联调资源。")).toBeInTheDocument();
   expect(screen.getByText("管理员回复")).toBeInTheDocument();
   expect(screen.getByText("已经安排负责人评估这个流程调整。")).toBeInTheDocument();
+  expect(screen.getByText("匿名补充")).toBeInTheDocument();
+  expect(screen.getByText("补充一下，主要堵点出在跨团队联调。")).toBeInTheDocument();
 });

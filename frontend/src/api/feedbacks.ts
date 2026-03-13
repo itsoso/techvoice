@@ -60,6 +60,10 @@ export type PublicFeedback = {
     content: string;
     created_at: string;
   }[];
+  employee_replies: {
+    content: string;
+    created_at: string;
+  }[];
   star_count: number;
   created_at: string;
 };

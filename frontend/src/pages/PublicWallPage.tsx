@@ -102,6 +102,7 @@ export default function PublicWallPage() {
       <section className="wall-grid">
         {items.map((item) => {
           const adminReplies = item.admin_replies ?? [];
+          const employeeReplies = item.employee_replies ?? [];
 
           return (
             <article className="entry-card" key={item.public_code}>
@@ -114,6 +115,16 @@ export default function PublicWallPage() {
                   <h3>管理员回复</h3>
                   {adminReplies.map((reply, index) => (
                     <div className="wall-reply" key={`${item.public_code}-${reply.created_at}-${index}`}>
+                      <p>{reply.content}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {employeeReplies.length > 0 ? (
+                <div className="wall-replies">
+                  <h3>匿名补充</h3>
+                  {employeeReplies.map((reply, index) => (
+                    <div className="wall-reply" key={`${item.public_code}-employee-${reply.created_at}-${index}`}>
                       <p>{reply.content}</p>
                     </div>
                   ))}

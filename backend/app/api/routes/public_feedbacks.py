@@ -6,6 +6,7 @@ from app.models.enums import ActorType, EventType
 from app.models.feedback import Feedback
 from app.schemas.feedback import (
     PublicAdminReplyRead,
+    PublicEmployeeReplyRead,
     PublicFeedbackListResponse,
     PublicFeedbackRead,
     StarResponse,
@@ -21,6 +22,11 @@ def serialize_public_feedback(feedback: Feedback) -> PublicFeedbackRead:
         for event in feedback.events
         if event.actor_type == ActorType.ADMIN and event.event_type == EventType.REPLY and event.content
     ]
+    employee_replies = [
+        PublicEmployeeReplyRead(content=event.content, created_at=event.created_at)
+        for event in feedback.events
+        if event.actor_type == ActorType.EMPLOYEE and event.event_type == EventType.REPLY and event.content
+    ]
 
     return PublicFeedbackRead(
         public_code=feedback.public_code,
@@ -33,6 +39,7 @@ def serialize_public_feedback(feedback: Feedback) -> PublicFeedbackRead:
         proposal_impact=feedback.proposal_impact,
         proposal_suggestion=feedback.proposal_suggestion,
         admin_replies=admin_replies,
+        employee_replies=employee_replies,
         star_count=feedback.star_count,
         created_at=feedback.created_at,
     )
