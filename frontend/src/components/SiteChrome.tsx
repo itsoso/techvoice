@@ -62,6 +62,8 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const isArchitecturePage =
     location.pathname === "/architecture" || location.pathname.startsWith("/architecture/");
+  const isRetrospectivePage =
+    location.pathname === "/retrospective" || location.pathname.startsWith("/retrospective/");
   const adminEntry = isAdminLoggedIn
     ? { label: "管理员", to: "/admin/feedbacks" }
     : getAdminEntryLink();
@@ -197,6 +199,14 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
                     to="/architecture"
                   >
                     系统架构
+                  </Link>
+                  <Link
+                    className={`display-menu-link${isRetrospectivePage ? " display-menu-link-active" : ""}`}
+                    onClick={() => setMenuOpen(false)}
+                    role="menuitem"
+                    to="/retrospective"
+                  >
+                    项目复盘
                   </Link>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import ArchitecturePage from "./pages/ArchitecturePage";
 import ProposalSubmitPage from "./pages/ProposalSubmitPage";
 import PublicWallPage from "./pages/PublicWallPage";
+import RetrospectivePage from "./pages/RetrospectivePage";
 import SuccessPage from "./pages/SuccessPage";
 import TrackDetailPage from "./pages/TrackDetailPage";
 import TrackLookupPage from "./pages/TrackLookupPage";
@@ -19,6 +20,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/architecture" element={<ArchitecturePage />} />
+        <Route path="/retrospective" element={<RetrospectivePage />} />
         <Route path="/submit/vent" element={<VentSubmitPage />} />
         <Route path="/submit/proposal" element={<ProposalSubmitPage />} />
         <Route path="/success/:threadCode" element={<SuccessPage />} />

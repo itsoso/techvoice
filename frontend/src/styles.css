@@ -880,6 +880,73 @@ a {
   color: var(--text);
 }
 
+.retrospective-panel {
+  margin-top: 24px;
+  padding: 30px;
+  border-radius: 30px;
+  border: 1px solid var(--panel-border);
+  background: linear-gradient(180deg, var(--panel-surface-top), var(--panel));
+  box-shadow: var(--shadow);
+}
+
+.retrospective-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.retrospective-heading,
+.retrospective-subheading {
+  margin: 14px 0 0;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.retrospective-heading {
+  font-size: 1.34rem;
+}
+
+.retrospective-subheading {
+  font-size: 1.05rem;
+}
+
+.retrospective-paragraph {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.78;
+  white-space: pre-wrap;
+}
+
+.retrospective-list {
+  margin: -4px 0 4px 1.15rem;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  color: var(--text-soft);
+  line-height: 1.72;
+}
+
+.retrospective-list-ordered {
+  margin-left: 1.3rem;
+}
+
+.retrospective-link {
+  color: var(--cyan);
+}
+
+.retrospective-link:hover {
+  color: var(--text);
+}
+
+.inline-code {
+  padding: 0.12rem 0.38rem;
+  border-radius: 999px;
+  background: rgba(119, 214, 255, 0.1);
+  color: var(--green);
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.92em;
+}
+
 @media (max-width: 760px) {
   .page-shell {
     width: min(100% - 24px, 1120px);
@@ -938,6 +1005,10 @@ a {
   }
 
   .schema-panel {
+    padding: 24px;
+  }
+
+  .retrospective-panel {
     padding: 24px;
   }
 }

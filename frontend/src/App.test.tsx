@@ -26,6 +26,15 @@ it("renders the public architecture page", () => {
   expect(screen.getByText("feedback_events")).toBeInTheDocument();
 });
 
+it("renders the public retrospective page", () => {
+  window.history.pushState({}, "", "/retrospective");
+
+  render(<App />);
+
+  expect(screen.getByRole("heading", { level: 1, name: "TechVoice 系统构建完整复盘" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 2, name: "最佳实践清单" })).toBeInTheDocument();
+});
+
 it("redirects expired admin sessions back to the login page", async () => {
   window.history.pushState({}, "", "/admin/feedbacks");
   localStorage.setItem("techvoice-admin-token", "stale-token");

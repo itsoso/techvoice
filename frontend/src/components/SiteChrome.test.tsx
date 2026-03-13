@@ -64,6 +64,7 @@ it("opens the display menu for theme changes and architecture navigation", async
   await user.click(screen.getByRole("button", { name: /显示/i }));
   expect(screen.getByRole("menu")).toBeInTheDocument();
   expect(screen.getByRole("menuitem", { name: "系统架构" })).toHaveAttribute("href", "/architecture");
+  expect(screen.getByRole("menuitem", { name: "项目复盘" })).toHaveAttribute("href", "/retrospective");
 
   await user.click(screen.getByRole("menuitemradio", { name: "浅色" }));
 
