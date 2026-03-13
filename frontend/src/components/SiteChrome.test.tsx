@@ -37,6 +37,7 @@ it("renders primary navigation and breadcrumbs", () => {
 
   expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "我要吐槽" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "管理员登录" })).toHaveAttribute("href", "/admin/login");
   expect(screen.getByRole("link", { name: "系统架构" })).toBeInTheDocument();
   expect(screen.getByRole("navigation", { name: "面包屑" })).toBeInTheDocument();
   expect(screen.getByRole("navigation", { name: "面包屑" })).toHaveTextContent("查询追踪");

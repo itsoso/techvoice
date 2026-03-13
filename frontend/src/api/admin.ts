@@ -1,4 +1,4 @@
-import { apiRequest } from "./client";
+import { ApiError, apiRequest } from "./client";
 import type { FeedbackDetail } from "./feedbacks";
 
 const ADMIN_TOKEN_KEY = "techvoice-admin-token";
@@ -29,7 +29,30 @@ export function setAdminToken(token: string) {
 }
 
 export function getAdminToken() {
-  return localStorage.getItem(ADMIN_TOKEN_KEY);
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+  return token && token.trim() ? token : null;
+}
+
+export function clearAdminToken() {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+}
+
+export function getAdminEntryLink() {
+  return getAdminToken()
+    ? { label: "管理员", to: "/admin/feedbacks" }
+    : { label: "管理员登录", to: "/admin/login" };
+}
+
+export function isAdminAuthError(error: unknown) {
+  if (error instanceof ApiError) {
+    return error.status === 401;
+  }
+
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /invalid token|not authenticated|could not validate credentials/i.test(error.message);
 }
 
 export async function adminLogin(username: string, password: string) {

@@ -17,6 +17,16 @@ const API_BASE_URL = resolveApiBaseUrl(
 
 type JsonValue = Record<string, unknown> | Array<unknown> | string | number | boolean | null;
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 export function formatErrorDetail(detail: unknown): string {
   if (detail == null) {
     return "请求失败";
@@ -71,7 +81,7 @@ export async function apiRequest<TResponse>(
 
   if (!response.ok) {
     const errorBody = (await response.json().catch(() => null)) as JsonValue | null;
-    throw new Error(formatErrorDetail(errorBody));
+    throw new ApiError(formatErrorDetail(errorBody), response.status);
   }
 
   return (await response.json()) as TResponse;

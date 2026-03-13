@@ -1,8 +1,11 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import {
+  clearAdminToken,
+  getAdminToken,
   getAdminFeedback,
+  isAdminAuthError,
   publishAdminFeedback,
   replyAdminFeedback,
   updateAdminFeedbackStatus,
@@ -12,6 +15,7 @@ import type { FeedbackDetail, TimelineEvent } from "../../api/feedbacks";
 
 export default function AdminFeedbackDetailPage() {
   const { feedbackId = "" } = useParams();
+  const navigate = useNavigate();
   const [feedback, setFeedback] = useState<FeedbackDetail | null>(null);
   const [reply, setReply] = useState("");
   const [status, setStatus] = useState("reviewing");
@@ -30,6 +34,11 @@ export default function AdminFeedbackDetailPage() {
     return actionError instanceof Error ? actionError.message : fallback;
   }
 
+  function redirectToLogin() {
+    clearAdminToken();
+    navigate("/admin/login", { replace: true });
+  }
+
   function appendTimelineEvent(event: TimelineEvent) {
     setFeedback((current) => {
       if (!current) {
@@ -45,10 +54,20 @@ export default function AdminFeedbackDetailPage() {
   }
 
   useEffect(() => {
+    if (!getAdminToken()) {
+      redirectToLogin();
+      return;
+    }
+
     void refresh().catch((loadError) => {
+      if (isAdminAuthError(loadError)) {
+        redirectToLogin();
+        return;
+      }
+
       setError(loadError instanceof Error ? loadError.message : "加载失败");
     });
-  }, [feedbackId]);
+  }, [feedbackId, navigate]);
 
   async function handleReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,6 +91,11 @@ export default function AdminFeedbackDetailPage() {
       });
       setReply("");
     } catch (replyError) {
+      if (isAdminAuthError(replyError)) {
+        redirectToLogin();
+        return;
+      }
+
       setError(getErrorMessage(replyError, "发送回复失败，请稍后重试。"));
     }
   }
@@ -85,6 +109,11 @@ export default function AdminFeedbackDetailPage() {
       await refresh();
       setSuccess("状态已更新。");
     } catch (statusError) {
+      if (isAdminAuthError(statusError)) {
+        redirectToLogin();
+        return;
+      }
+
       setError(getErrorMessage(statusError, "更新状态失败，请稍后重试。"));
     }
   }
@@ -126,6 +155,11 @@ export default function AdminFeedbackDetailPage() {
       setStatus(published.status);
       setSuccess("已发布到回音壁。");
     } catch (publishError) {
+      if (isAdminAuthError(publishError)) {
+        redirectToLogin();
+        return;
+      }
+
       setError(getErrorMessage(publishError, "发布失败，请稍后重试。"));
     }
   }

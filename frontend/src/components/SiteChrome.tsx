@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
+import { getAdminEntryLink } from "../api/admin";
 import {
   applyThemePreference,
   readThemePreference,
@@ -17,13 +18,12 @@ type SiteChromeProps = {
   breadcrumbs: BreadcrumbItem[];
 };
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { label: "首页", to: "/", exact: true },
   { label: "我要吐槽", to: "/submit/vent" },
   { label: "我有提案", to: "/submit/proposal" },
   { label: "查询追踪", to: "/track" },
   { label: "回音壁", to: "/wall" },
-  { label: "管理员", to: "/admin/feedbacks", prefixes: ["/admin"] },
 ] as const;
 
 const THEME_OPTIONS: Array<{ label: string; value: ThemePreference }> = [
@@ -52,6 +52,15 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const [themePreference, setThemePreference] = useState<ThemePreference>(() => readThemePreference());
   const isArchitecturePage =
     location.pathname === "/architecture" || location.pathname.startsWith("/architecture/");
+  const adminEntry = getAdminEntryLink();
+  const navItems = [
+    ...BASE_NAV_ITEMS,
+    {
+      label: adminEntry.label,
+      to: adminEntry.to,
+      prefixes: ["/admin"],
+    },
+  ] as const;
 
   useEffect(() => {
     applyThemePreference(themePreference);
@@ -85,7 +94,7 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
         </Link>
         <div className="site-nav-stack">
           <nav aria-label="主导航" className="site-nav">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <Link
                 className={`site-nav-link${isActivePath(location.pathname, item) ? " site-nav-link-active" : ""}`}
                 key={item.label}

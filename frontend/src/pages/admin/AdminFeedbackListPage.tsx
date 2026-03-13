@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import { getAdminToken, listAdminFeedbacks, type AdminFeedbackSummary } from "../../api/admin";
+import {
+  clearAdminToken,
+  getAdminToken,
+  isAdminAuthError,
+  listAdminFeedbacks,
+  type AdminFeedbackSummary,
+} from "../../api/admin";
 import SiteChrome from "../../components/SiteChrome";
 
 export default function AdminFeedbackListPage() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<AdminFeedbackSummary[]>([]);
   const [error, setError] = useState("");
 
@@ -13,7 +21,7 @@ export default function AdminFeedbackListPage() {
 
     async function loadItems() {
       if (!getAdminToken()) {
-        setError("请先登录管理员账号。");
+        navigate("/admin/login", { replace: true });
         return;
       }
 
@@ -23,6 +31,12 @@ export default function AdminFeedbackListPage() {
           setItems(response.items);
         }
       } catch (loadError) {
+        if (isAdminAuthError(loadError)) {
+          clearAdminToken();
+          navigate("/admin/login", { replace: true });
+          return;
+        }
+
         if (!cancelled) {
           setError(loadError instanceof Error ? loadError.message : "加载失败");
         }
@@ -33,7 +47,7 @@ export default function AdminFeedbackListPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [navigate]);
 
   return (
     <main className="page-shell">
