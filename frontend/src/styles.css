@@ -406,6 +406,11 @@ a {
   font-size: 1.85rem;
 }
 
+.wall-card-title {
+  font-size: 1.48rem;
+  line-height: 1.2;
+}
+
 .entry-badge {
   display: inline-flex;
   align-items: center;

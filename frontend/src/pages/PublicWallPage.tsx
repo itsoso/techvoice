@@ -107,7 +107,7 @@ export default function PublicWallPage() {
           return (
             <article className="entry-card" key={item.public_code}>
               <span className="entry-badge">{item.category}</span>
-              <h2>{item.type === "proposal" ? "建设性提案" : "敏锐观察"}</h2>
+              <h2 className="wall-card-title">{item.type === "proposal" ? "建设性提案" : "敏锐观察"}</h2>
               {item.title ? <p className="wall-title">{item.title}</p> : null}
               {item.type === "proposal" ? renderProposalSections(item) : renderVentContent(item)}
               {adminReplies.length > 0 ? (

@@ -35,6 +35,7 @@ it("renders published feedback cards", async () => {
 
   expect(await screen.findByText(/长时间排队的任务窗口公开出来/i)).toBeInTheDocument();
   expect(screen.getByRole("heading", { level: 1, name: "回音壁" })).toHaveClass("section-title");
+  expect(screen.getByRole("heading", { level: 2, name: "敏锐观察" })).toHaveClass("wall-card-title");
 });
 
 it("renders full proposal content and admin replies on the public wall", async () => {
