@@ -123,71 +123,69 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
         <Link className="site-brand" to="/">
           Echo｜TechVoice
         </Link>
-        <div className="site-nav-stack">
-          <nav aria-label="主导航" className="site-nav">
-            {navItems.map((item) => (
-              <Link
-                className={`site-nav-link${isActivePath(location.pathname, item) ? " site-nav-link-active" : ""}`}
-                key={item.label}
-                to={item.to}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="site-utility-row">
-            <div className="display-menu-shell" ref={menuRef}>
-              <button
-                aria-label={`显示设置，当前${displayLabel}`}
-                aria-expanded={menuOpen}
-                aria-haspopup="menu"
-                className={`display-menu-trigger${menuOpen ? " display-menu-trigger-open" : ""}`}
-                onClick={() => setMenuOpen((current) => !current)}
-                type="button"
-              >
-                <span className="sr-only">显示设置</span>
-                <strong className="display-menu-value">{displayLabel}</strong>
-                <span aria-hidden="true" className="display-menu-caret">
-                  ▾
-                </span>
-              </button>
+        <nav aria-label="主导航" className="site-nav">
+          {navItems.map((item) => (
+            <Link
+              className={`site-nav-link${isActivePath(location.pathname, item) ? " site-nav-link-active" : ""}`}
+              key={item.label}
+              to={item.to}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="site-utility-row">
+          <div className="display-menu-shell" ref={menuRef}>
+            <button
+              aria-label={`显示设置，当前${displayLabel}`}
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
+              className={`display-menu-trigger${menuOpen ? " display-menu-trigger-open" : ""}`}
+              onClick={() => setMenuOpen((current) => !current)}
+              type="button"
+            >
+              <span className="sr-only">显示设置</span>
+              <strong className="display-menu-value">{displayLabel}</strong>
+              <span aria-hidden="true" className="display-menu-caret">
+                ▾
+              </span>
+            </button>
 
-              {menuOpen ? (
-                <div aria-label="显示菜单" className="display-menu-popover" role="menu">
-                  <div className="display-menu-group">
-                    <p className="display-menu-group-label">主题</p>
-                    {THEME_OPTIONS.map((option) => (
-                      <button
-                        aria-checked={themePreference === option.value}
-                        className={`display-menu-item${
-                          themePreference === option.value ? " display-menu-item-active" : ""
-                        }`}
-                        key={option.value}
-                        onClick={() => handleThemeChange(option.value)}
-                        role="menuitemradio"
-                        type="button"
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="display-menu-divider" />
-
-                  <div className="display-menu-group">
-                    <p className="display-menu-group-label">说明</p>
-                    <Link
-                      className={`display-menu-link${isArchitecturePage ? " display-menu-link-active" : ""}`}
-                      onClick={() => setMenuOpen(false)}
-                      role="menuitem"
-                      to="/architecture"
+            {menuOpen ? (
+              <div aria-label="显示菜单" className="display-menu-popover" role="menu">
+                <div className="display-menu-group">
+                  <p className="display-menu-group-label">主题</p>
+                  {THEME_OPTIONS.map((option) => (
+                    <button
+                      aria-checked={themePreference === option.value}
+                      className={`display-menu-item${
+                        themePreference === option.value ? " display-menu-item-active" : ""
+                      }`}
+                      key={option.value}
+                      onClick={() => handleThemeChange(option.value)}
+                      role="menuitemradio"
+                      type="button"
                     >
-                      系统架构
-                    </Link>
-                  </div>
+                      {option.label}
+                    </button>
+                  ))}
                 </div>
-              ) : null}
-            </div>
+
+                <div className="display-menu-divider" />
+
+                <div className="display-menu-group">
+                  <p className="display-menu-group-label">说明</p>
+                  <Link
+                    className={`display-menu-link${isArchitecturePage ? " display-menu-link-active" : ""}`}
+                    onClick={() => setMenuOpen(false)}
+                    role="menuitem"
+                    to="/architecture"
+                  >
+                    系统架构
+                  </Link>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
