@@ -3,6 +3,7 @@ import {
   readThemePreference,
   resolveTheme,
   saveThemePreference,
+  THEME_EXPLICIT_KEY,
   THEME_STORAGE_KEY,
 } from "./theme";
 
@@ -32,13 +33,26 @@ it("resolves system theme from the current media query", () => {
   expect(resolveTheme("system", false)).toBe("light");
 });
 
+it("treats legacy system preference as dark by default", () => {
+  localStorage.setItem(THEME_STORAGE_KEY, "system");
+
+  expect(readThemePreference()).toBe("dark");
+});
+
 it("saves and reapplies an explicit theme preference", () => {
   mockMatchMedia(false);
 
   saveThemePreference("dark");
 
   expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
+  expect(localStorage.getItem(THEME_EXPLICIT_KEY)).toBe("1");
   expect(readThemePreference()).toBe("dark");
   expect(applyThemePreference("dark")).toBe("dark");
   expect(document.documentElement.dataset.theme).toBe("dark");
+});
+
+it("preserves system when the user explicitly chooses it", () => {
+  saveThemePreference("system");
+
+  expect(readThemePreference()).toBe("system");
 });
