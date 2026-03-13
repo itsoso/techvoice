@@ -1,7 +1,22 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { getFeedback, replyToFeedback, type FeedbackDetail } from "../api/feedbacks";
+import SiteChrome from "../components/SiteChrome";
+
+function getSubmissionContent(feedback: FeedbackDetail) {
+  if (feedback.type === "proposal") {
+    return [
+      feedback.proposal_problem && `观察到的现象\n${feedback.proposal_problem}`,
+      feedback.proposal_impact && `带来的影响\n${feedback.proposal_impact}`,
+      feedback.proposal_suggestion && `我的建议方案\n${feedback.proposal_suggestion}`,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+  }
+
+  return feedback.content_markdown ?? "";
+}
 
 export default function TrackDetailPage() {
   const { threadCode = "" } = useParams();
@@ -54,11 +69,16 @@ export default function TrackDetailPage() {
 
   return (
     <main className="page-shell narrow-shell">
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "查询追踪", to: "/track" },
+          { label: "匿名沟通时间线" },
+        ]}
+      />
+
       <section className="form-panel">
         <div className="panel-header">
-          <Link className="ghost-link" to="/track">
-            返回查询
-          </Link>
           <h1>匿名沟通时间线</h1>
           <p>{threadCode}</p>
         </div>
@@ -71,6 +91,14 @@ export default function TrackDetailPage() {
               <span className="status-pill">{feedback.status}</span>
               <span className="helper-copy">{feedback.category}</span>
             </div>
+
+            {getSubmissionContent(feedback) ? (
+              <section className="detail-card">
+                <p className="mono-kicker">Initial Submission</p>
+                <h2>你的原始提交</h2>
+                <p className="detail-copy">{getSubmissionContent(feedback)}</p>
+              </section>
+            ) : null}
 
             <ol className="timeline-list">
               {feedback.events.map((event, index) => (

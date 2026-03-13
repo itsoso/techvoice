@@ -36,3 +36,23 @@ it("renders feedback rows from the admin api", async () => {
 
   expect(await screen.findByText(/ECH-AB12CD/i)).toBeInTheDocument();
 });
+
+it("uses the compact section title style for the admin board heading", async () => {
+  vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    new Response(
+      JSON.stringify({
+        items: [],
+      }),
+    ),
+  );
+
+  localStorage.setItem("techvoice-admin-token", "demo-token");
+
+  render(
+    <MemoryRouter>
+      <AdminFeedbackListPage />
+    </MemoryRouter>,
+  );
+
+  expect(await screen.findByRole("heading", { name: "匿名反馈看板" })).toHaveClass("section-title");
+});

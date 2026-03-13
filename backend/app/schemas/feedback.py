@@ -113,9 +113,12 @@ class AdminReplyCreate(BaseModel):
     content: str
 
 
-class PublicFeedbackRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class PublicAdminReplyRead(BaseModel):
+    content: str
+    created_at: datetime
 
+
+class PublicFeedbackRead(BaseModel):
     public_code: str
     type: FeedbackType
     category: str
@@ -125,6 +128,7 @@ class PublicFeedbackRead(BaseModel):
     proposal_problem: str | None
     proposal_impact: str | None
     proposal_suggestion: str | None
+    admin_replies: list[PublicAdminReplyRead]
     star_count: int
     created_at: datetime
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { getAdminToken, listAdminFeedbacks, type AdminFeedbackSummary } from "../../api/admin";
+import SiteChrome from "../../components/SiteChrome";
 
 export default function AdminFeedbackListPage() {
   const [items, setItems] = useState<AdminFeedbackSummary[]>([]);
@@ -36,9 +37,16 @@ export default function AdminFeedbackListPage() {
 
   return (
     <main className="page-shell">
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "管理员看板" },
+        ]}
+      />
+
       <section className="hero-panel">
         <p className="mono-kicker">Admin Console</p>
-        <h1>匿名反馈看板</h1>
+        <h1 className="section-title">匿名反馈看板</h1>
         <p className="hero-copy">集中查看全部匿名反馈，进入详情页回复、改状态并公开到回音壁。</p>
       </section>
 

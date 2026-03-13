@@ -7,7 +7,8 @@ import {
   replyAdminFeedback,
   updateAdminFeedbackStatus,
 } from "../../api/admin";
-import type { FeedbackDetail } from "../../api/feedbacks";
+import SiteChrome from "../../components/SiteChrome";
+import type { FeedbackDetail, TimelineEvent } from "../../api/feedbacks";
 
 export default function AdminFeedbackDetailPage() {
   const { feedbackId = "" } = useParams();
@@ -16,11 +17,31 @@ export default function AdminFeedbackDetailPage() {
   const [status, setStatus] = useState("reviewing");
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   async function refresh() {
     const response = await getAdminFeedback(feedbackId);
     setFeedback(response);
     setStatus(response.status);
+    setError("");
+  }
+
+  function getErrorMessage(actionError: unknown, fallback: string) {
+    return actionError instanceof Error ? actionError.message : fallback;
+  }
+
+  function appendTimelineEvent(event: TimelineEvent) {
+    setFeedback((current) => {
+      if (!current) {
+        return current;
+      }
+
+      return {
+        ...current,
+        updated_at: event.created_at,
+        events: [...current.events, event],
+      };
+    });
   }
 
   useEffect(() => {
@@ -31,24 +52,94 @@ export default function AdminFeedbackDetailPage() {
 
   async function handleReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await replyAdminFeedback(feedbackId, reply);
-    setReply("");
-    await refresh();
+    setError("");
+    setSuccess("");
+
+    if (!reply.trim()) {
+      setError("请先填写回复内容。");
+      return;
+    }
+
+    try {
+      const content = reply.trim();
+      await replyAdminFeedback(feedbackId, content);
+      appendTimelineEvent({
+        actor_type: "admin",
+        event_type: "reply",
+        content,
+        meta_json: null,
+        created_at: new Date().toISOString(),
+      });
+      setReply("");
+    } catch (replyError) {
+      setError(getErrorMessage(replyError, "发送回复失败，请稍后重试。"));
+    }
   }
 
   async function handleStatusUpdate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await updateAdminFeedbackStatus(feedbackId, status, reason);
-    await refresh();
+    setError("");
+    setSuccess("");
+    try {
+      await updateAdminFeedbackStatus(feedbackId, status, reason.trim());
+      await refresh();
+      setSuccess("状态已更新。");
+    } catch (statusError) {
+      setError(getErrorMessage(statusError, "更新状态失败，请稍后重试。"));
+    }
   }
 
   async function handlePublish() {
-    await publishAdminFeedback(feedbackId);
-    await refresh();
+    setError("");
+    setSuccess("");
+
+    if (feedback?.is_public) {
+      setSuccess("该反馈已发布到回音壁。");
+      return;
+    }
+
+    try {
+      const published = await publishAdminFeedback(feedbackId);
+      setFeedback((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          status: published.status,
+          is_public: published.is_public,
+          star_count: published.star_count,
+          updated_at: published.updated_at,
+          events: [
+            ...current.events,
+            {
+              actor_type: "admin",
+              event_type: "published",
+              content: "已公开到回音壁",
+              meta_json: null,
+              created_at: published.updated_at,
+            },
+          ],
+        };
+      });
+      setStatus(published.status);
+      setSuccess("已发布到回音壁。");
+    } catch (publishError) {
+      setError(getErrorMessage(publishError, "发布失败，请稍后重试。"));
+    }
   }
 
   return (
     <main className="page-shell">
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "管理员看板", to: "/admin/feedbacks" },
+          { label: "反馈详情" },
+        ]}
+      />
+
       <section className="form-panel">
         <div className="panel-header">
           <Link className="ghost-link" to="/admin/feedbacks">
@@ -59,9 +150,40 @@ export default function AdminFeedbackDetailPage() {
         </div>
 
         {error ? <p className="error-banner">{error}</p> : null}
+        {success ? (
+          <p aria-live="polite" className="success-banner" role="status">
+            {success}
+          </p>
+        ) : null}
 
         {feedback ? (
           <>
+            <section className="detail-card">
+              <p className="mono-kicker">Anonymous Submission</p>
+              <h2>匿名用户提交内容</h2>
+              {feedback.type === "proposal" ? (
+                <div className="detail-grid">
+                  <div className="field">
+                    <span>观察到的现象</span>
+                    <p className="detail-copy">{feedback.proposal_problem ?? "未填写"}</p>
+                  </div>
+                  <div className="field">
+                    <span>带来的影响</span>
+                    <p className="detail-copy">{feedback.proposal_impact ?? "未填写"}</p>
+                  </div>
+                  <div className="field">
+                    <span>我的建议方案</span>
+                    <p className="detail-copy">{feedback.proposal_suggestion ?? "未填写"}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="field">
+                  <span>问题描述</span>
+                  <p className="detail-copy">{feedback.content_markdown ?? "未填写"}</p>
+                </div>
+              )}
+            </section>
+
             <ol className="timeline-list">
               {feedback.events.map((event, index) => (
                 <li className="timeline-item" key={`${event.created_at}-${index}`}>
@@ -92,6 +214,7 @@ export default function AdminFeedbackDetailPage() {
                   <option value="needs_info">needs_info</option>
                   <option value="accepted">accepted</option>
                   <option value="deferred">deferred</option>
+                  <option value="published">published</option>
                 </select>
               </label>
               <label className="field">
@@ -102,8 +225,13 @@ export default function AdminFeedbackDetailPage() {
                 <button className="primary-button vent-button" type="submit">
                   更新状态
                 </button>
-                <button className="ghost-button" onClick={() => void handlePublish()} type="button">
-                  发布到回音壁
+                <button
+                  className="ghost-button"
+                  disabled={feedback.is_public}
+                  onClick={() => void handlePublish()}
+                  type="button"
+                >
+                  {feedback.is_public ? "已发布到回音壁" : "发布到回音壁"}
                 </button>
               </div>
             </form>

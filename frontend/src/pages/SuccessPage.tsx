@@ -1,10 +1,19 @@
 import { Link, useParams } from "react-router-dom";
 
+import SiteChrome from "../components/SiteChrome";
+
 export default function SuccessPage() {
   const { threadCode } = useParams();
 
   return (
     <main className="page-shell narrow-shell">
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "提交成功" },
+        ]}
+      />
+
       <section className="success-panel">
         <p className="mono-kicker">Transmission complete</p>
         <h1>你的声音已加密送达</h1>

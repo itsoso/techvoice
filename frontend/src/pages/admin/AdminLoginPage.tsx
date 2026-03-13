@@ -1,7 +1,8 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { adminLogin, setAdminToken } from "../../api/admin";
+import SiteChrome from "../../components/SiteChrome";
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
@@ -23,11 +24,15 @@ export default function AdminLoginPage() {
 
   return (
     <main className="page-shell narrow-shell">
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "管理员登录" },
+        ]}
+      />
+
       <section className="form-panel">
         <div className="panel-header">
-          <Link className="ghost-link" to="/">
-            返回首页
-          </Link>
           <h1>管理员登录</h1>
           <p>使用本地管理员账号进入匿名反馈看板。</p>
         </div>

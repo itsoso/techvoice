@@ -5,5 +5,5 @@ import App from "./App";
 it("renders application shell", () => {
   render(<App />);
 
-  expect(screen.getByText(/Echo｜TechVoice/i)).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: /Echo｜TechVoice/i })).toBeInTheDocument();
 });

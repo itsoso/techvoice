@@ -1,5 +1,7 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import SiteChrome from "../components/SiteChrome";
 
 export default function TrackLookupPage() {
   const navigate = useNavigate();
@@ -15,11 +17,15 @@ export default function TrackLookupPage() {
 
   return (
     <main className="page-shell narrow-shell">
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "查询追踪" },
+        ]}
+      />
+
       <section className="form-panel">
         <div className="panel-header">
-          <Link className="ghost-link" to="/">
-            返回首页
-          </Link>
           <h1>查询追踪码</h1>
           <p>输入提交成功后保存的 thread code，查看当前状态、官方回复和后续进展。</p>
         </div>

@@ -1,8 +1,8 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { createFeedback } from "../api/feedbacks";
-import { isCooldownActive, markSubmissionTime } from "../lib/cooldown";
+import SiteChrome from "../components/SiteChrome";
 import { containsSensitiveWord } from "../lib/sensitiveWords";
 
 export default function VentSubmitPage() {
@@ -26,11 +26,6 @@ export default function VentSubmitPage() {
       return;
     }
 
-    if (isCooldownActive(Date.now())) {
-      setError("10 分钟内只能提交 1 次，请稍后再试。");
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       const response = await createFeedback({
@@ -38,7 +33,6 @@ export default function VentSubmitPage() {
         category,
         content_markdown: content.trim(),
       });
-      markSubmissionTime(Date.now());
       navigate(`/success/${response.thread_code}`);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "提交失败，请稍后重试。");
@@ -49,12 +43,16 @@ export default function VentSubmitPage() {
 
   return (
     <main className="page-shell narrow-shell">
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "我要吐槽" },
+        ]}
+      />
+
       <section className="form-panel">
         <div className="panel-header">
-          <Link className="ghost-link" to="/">
-            返回首页
-          </Link>
-          <h1>我要吐槽</h1>
+          <h1 className="display-title">我要吐槽</h1>
           <p>聚焦当前最真实、最阻塞工作流的问题。可匿名，可追踪。</p>
         </div>
 

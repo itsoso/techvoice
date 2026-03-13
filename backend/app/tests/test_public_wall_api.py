@@ -65,3 +65,48 @@ def test_public_feedbacks_lists_published_items(client: TestClient, seeded_admin
 
     assert response.status_code == 200
     assert len(response.json()["items"]) == 1
+
+
+def test_public_feedbacks_include_full_content_and_admin_replies(client: TestClient, seeded_admin) -> None:
+    create_response = client.post(
+        "/api/v1/feedbacks",
+        json={
+            "type": "proposal",
+            "category": "engineering_process",
+            "proposal_problem": "发布窗口和联调排期经常冲突。",
+            "proposal_impact": "需求上线节奏反复被打断，跨团队沟通成本变高。",
+            "proposal_suggestion": "统一在周三冻结需求并提前一天确认联调资源。",
+        },
+    )
+    assert create_response.status_code == 201
+
+    listing = client.get("/api/v1/admin/feedbacks", headers=admin_headers(client))
+    assert listing.status_code == 200
+    feedback_id = listing.json()["items"][0]["id"]
+
+    reply_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/reply",
+        headers=admin_headers(client),
+        json={"content": "已经安排负责人评估这个流程调整。"},
+    )
+    assert reply_response.status_code == 201
+
+    publish_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/publish",
+        headers=admin_headers(client),
+    )
+    assert publish_response.status_code == 200
+
+    response = client.get("/api/v1/public/feedbacks")
+
+    assert response.status_code == 200
+    item = response.json()["items"][0]
+    assert item["proposal_problem"] == "发布窗口和联调排期经常冲突。"
+    assert item["proposal_impact"] == "需求上线节奏反复被打断，跨团队沟通成本变高。"
+    assert item["proposal_suggestion"] == "统一在周三冻结需求并提前一天确认联调资源。"
+    assert item["admin_replies"] == [
+        {
+            "content": "已经安排负责人评估这个流程调整。",
+            "created_at": item["admin_replies"][0]["created_at"],
+        }
+    ]

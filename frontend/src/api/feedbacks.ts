@@ -56,6 +56,10 @@ export type PublicFeedback = {
   proposal_problem: string | null;
   proposal_impact: string | null;
   proposal_suggestion: string | null;
+  admin_replies: {
+    content: string;
+    created_at: string;
+  }[];
   star_count: number;
   created_at: string;
 };

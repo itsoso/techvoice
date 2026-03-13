@@ -43,4 +43,6 @@ it("renders timeline events for a tracked thread", async () => {
   );
 
   expect(await screen.findByText(/你的声音已加密送达/i)).toBeInTheDocument();
+  expect(screen.getByText("你的原始提交")).toBeInTheDocument();
+  expect(screen.getByText("流水线排队。")).toBeInTheDocument();
 });

@@ -149,6 +149,7 @@ def list_public_feedbacks(db: Session) -> list[Feedback]:
     return list(
         db.scalars(
             select(Feedback)
+            .options(selectinload(Feedback.events))
             .where(Feedback.is_public.is_(True))
             .order_by(Feedback.star_count.desc(), Feedback.created_at.desc())
         ).all()
