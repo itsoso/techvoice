@@ -1,11 +1,5 @@
 import SiteChrome from "../components/SiteChrome";
-
-const CODEBASE_SNAPSHOT = [
-  { label: "前端源码", value: "2,722 行", detail: "React + Vite + TypeScript" },
-  { label: "前端测试", value: "773 行", detail: "Vitest + Testing Library" },
-  { label: "后端应用", value: "915 行", detail: "FastAPI + SQLAlchemy" },
-  { label: "后端测试", value: "335 行", detail: "Pytest 接口回归" },
-] as const;
+import { CODEBASE_SCOPE, CODEBASE_SNAPSHOT, CODEBASE_TOTAL } from "../generated/codebaseSnapshot";
 
 const ARCHITECTURE_BLOCKS = [
   {
@@ -130,7 +124,14 @@ export default function ArchitecturePage() {
             <p>{metric.detail}</p>
           </article>
         ))}
+        <article className="architecture-stat-card" key={CODEBASE_TOTAL.label}>
+          <p className="mono-kicker">完整仓库快照</p>
+          <strong>{CODEBASE_TOTAL.value}</strong>
+          <span>{CODEBASE_TOTAL.label}</span>
+          <p>{CODEBASE_TOTAL.detail}</p>
+        </article>
       </section>
+      <p className="helper-copy">{CODEBASE_SCOPE}</p>
 
       <section className="architecture-grid">
         {ARCHITECTURE_BLOCKS.map((block) => (

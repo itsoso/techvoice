@@ -30,3 +30,41 @@ class EventType(StrEnum):
     HIDDEN = "hidden"
     RESTORED = "restored"
     STARRED = "starred"
+
+
+class TenantStatus(StrEnum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+
+
+class ExecutiveApprovalStatus(StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
+class LoungeEventStatus(StrEnum):
+    DRAFT = "draft"
+    TICKETING = "ticketing"
+    LIVE = "live"
+    CLOSED = "closed"
+    ARCHIVED = "archived"
+
+
+class LoungeTicketStatus(StrEnum):
+    CLAIMED = "claimed"
+    ENTERED = "entered"
+    EXPIRED = "expired"
+
+
+class LoungeSessionStatus(StrEnum):
+    WAITING = "waiting"
+    ACTIVE = "active"
+    CLOSED = "closed"
+    ARCHIVED = "archived"
+
+
+class LoungeSenderType(StrEnum):
+    PARTICIPANT = "participant"
+    EXECUTIVE = "executive"
+    SYSTEM = "system"

@@ -13,6 +13,8 @@ import AdminFeedbackDetailPage from "./pages/admin/AdminFeedbackDetailPage";
 import AdminFeedbackListPage from "./pages/admin/AdminFeedbackListPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminPublicWallPage from "./pages/admin/AdminPublicWallPage";
+import LoungeLandingPage from "./pages/lounge/LoungeLandingPage";
+import LoungeTicketPage from "./pages/lounge/LoungeTicketPage";
 
 export default function App() {
   return (
@@ -27,6 +29,8 @@ export default function App() {
         <Route path="/track" element={<TrackLookupPage />} />
         <Route path="/track/:threadCode" element={<TrackDetailPage />} />
         <Route path="/wall" element={<PublicWallPage />} />
+        <Route path="/t/:tenantSlug/lounge" element={<LoungeLandingPage />} />
+        <Route path="/t/:tenantSlug/lounge/:eventId/ticket" element={<LoungeTicketPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/feedbacks" element={<AdminFeedbackListPage />} />
         <Route path="/admin/feedbacks/:feedbackId" element={<AdminFeedbackDetailPage />} />
