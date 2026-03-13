@@ -87,8 +87,9 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
     : getAdminEntryLink();
   const tenantNavItem = getTenantScopedNavItem(location.pathname);
   const navItems = [
-    ...BASE_NAV_ITEMS,
+    BASE_NAV_ITEMS[0],
     ...(tenantNavItem ? [tenantNavItem] : []),
+    ...BASE_NAV_ITEMS.slice(1),
     {
       label: adminEntry.label,
       to: adminEntry.to,

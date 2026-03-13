@@ -112,4 +112,6 @@ it("shows a tenant lounge entry when browsing tenant-scoped pages", () => {
   );
 
   expect(screen.getByRole("link", { name: "会客厅" })).toHaveAttribute("href", "/t/kuaishou/lounge");
+  const navLinks = screen.getAllByRole("link").map((element) => element.textContent);
+  expect(navLinks.indexOf("会客厅")).toBeLessThan(navLinks.indexOf("我要吐槽"));
 });
