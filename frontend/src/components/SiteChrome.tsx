@@ -138,14 +138,18 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
           <div className="site-utility-row">
             <div className="display-menu-shell" ref={menuRef}>
               <button
+                aria-label={`显示设置，当前${displayLabel}`}
                 aria-expanded={menuOpen}
                 aria-haspopup="menu"
                 className={`display-menu-trigger${menuOpen ? " display-menu-trigger-open" : ""}`}
                 onClick={() => setMenuOpen((current) => !current)}
                 type="button"
               >
-                <span className="display-menu-kicker">显示</span>
-                <strong>{displayLabel}</strong>
+                <span className="sr-only">显示设置</span>
+                <strong className="display-menu-value">{displayLabel}</strong>
+                <span aria-hidden="true" className="display-menu-caret">
+                  ▾
+                </span>
               </button>
 
               {menuOpen ? (
