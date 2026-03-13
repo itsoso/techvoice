@@ -5,7 +5,7 @@ import SiteChrome from "../components/SiteChrome";
 export default function HomePage() {
   return (
     <main className="page-shell">
-      <SiteChrome breadcrumbs={[]} />
+      <SiteChrome breadcrumbs={[{ label: "首页" }]} />
 
       <section className="hero-panel">
         <p className="mono-kicker">No IP. No User-Agent. Just your voice.</p>

@@ -12,6 +12,7 @@ it("renders both employee entry cards", () => {
 
   expect(screen.getByRole("heading", { level: 2, name: "我要吐槽" })).toBeInTheDocument();
   expect(screen.getByRole("heading", { level: 2, name: "我有提案" })).toBeInTheDocument();
+  expect(screen.getByRole("navigation", { name: "面包屑" })).toHaveTextContent("首页");
 });
 
 it("uses the compact section title style for Echo｜TechVoice", () => {
