@@ -14,7 +14,13 @@ import AdminFeedbackListPage from "./pages/admin/AdminFeedbackListPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminPublicWallPage from "./pages/admin/AdminPublicWallPage";
 import LoungeLandingPage from "./pages/lounge/LoungeLandingPage";
+import LoungeRoomPage from "./pages/lounge/LoungeRoomPage";
 import LoungeTicketPage from "./pages/lounge/LoungeTicketPage";
+import ExecutiveRegisterPage from "./pages/lounge/ExecutiveRegisterPage";
+import ExecutiveLoginPage from "./pages/lounge/ExecutiveLoginPage";
+import ExecutiveLoungePage from "./pages/lounge/ExecutiveLoungePage";
+import TenantAdminLoginPage from "./pages/lounge/TenantAdminLoginPage";
+import TenantLoungeAdminPage from "./pages/lounge/TenantLoungeAdminPage";
 
 export default function App() {
   return (
@@ -31,6 +37,12 @@ export default function App() {
         <Route path="/wall" element={<PublicWallPage />} />
         <Route path="/t/:tenantSlug/lounge" element={<LoungeLandingPage />} />
         <Route path="/t/:tenantSlug/lounge/:eventId/ticket" element={<LoungeTicketPage />} />
+        <Route path="/t/:tenantSlug/lounge/:eventId/room" element={<LoungeRoomPage />} />
+        <Route path="/t/:tenantSlug/executive/register" element={<ExecutiveRegisterPage />} />
+        <Route path="/t/:tenantSlug/executive/login" element={<ExecutiveLoginPage />} />
+        <Route path="/t/:tenantSlug/executive/lounge" element={<ExecutiveLoungePage />} />
+        <Route path="/t/:tenantSlug/admin/login" element={<TenantAdminLoginPage />} />
+        <Route path="/t/:tenantSlug/admin/lounge-events" element={<TenantLoungeAdminPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/feedbacks" element={<AdminFeedbackListPage />} />
         <Route path="/admin/feedbacks/:feedbackId" element={<AdminFeedbackDetailPage />} />

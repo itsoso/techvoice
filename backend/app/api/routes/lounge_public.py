@@ -44,5 +44,5 @@ def enter_lounge_route(
     db: Session = Depends(get_db),
     x_lounge_fingerprint: str = Header(...),
 ) -> LoungeEnterResponse:
-    ticket = enter_lounge(db, tenant_slug, event_id, x_lounge_fingerprint, payload)
-    return LoungeEnterResponse(ticket_code=ticket.ticket_code, alias_label=ticket.alias_label)
+    ticket, session = enter_lounge(db, tenant_slug, event_id, x_lounge_fingerprint, payload)
+    return LoungeEnterResponse(ticket_code=ticket.ticket_code, alias_label=ticket.alias_label, session_id=session.id)

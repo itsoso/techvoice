@@ -16,6 +16,8 @@ it("renders a full repository snapshot instead of stale hard-coded counts", () =
   expect(screen.getByText("测试代码")).toBeInTheDocument();
   expect(screen.getByText("文档与静态资源")).toBeInTheDocument();
   expect(screen.getByText("当前快照总计")).toBeInTheDocument();
+  expect(screen.getByText("tenants")).toBeInTheDocument();
+  expect(screen.getByText("lounge_sessions")).toBeInTheDocument();
   expect(screen.queryByText("2,722 行")).not.toBeInTheDocument();
   expect(screen.queryByText("915 行")).not.toBeInTheDocument();
 });

@@ -6,18 +6,18 @@ export const CODEBASE_SCOPE =
 export const CODEBASE_SNAPSHOT = [
   {
     label: "前端生产代码",
-    value: "3,673 行",
-    detail: "30 个文件 · React + Vite + TypeScript",
+    value: "5,028 行",
+    detail: "36 个文件 · React + Vite + TypeScript",
   },
   {
     label: "后端生产代码",
-    value: "1,764 行",
-    detail: "46 个文件 · FastAPI + SQLAlchemy",
+    value: "2,254 行",
+    detail: "48 个文件 · FastAPI + SQLAlchemy",
   },
   {
     label: "测试代码",
-    value: "2,109 行",
-    detail: "37 个文件 · Vitest + Pytest 回归",
+    value: "2,614 行",
+    detail: "41 个文件 · Vitest + Pytest 回归",
   },
   {
     label: "文档与静态资源",
@@ -28,6 +28,6 @@ export const CODEBASE_SNAPSHOT = [
 
 export const CODEBASE_TOTAL = {
   label: "当前快照总计",
-  value: "10,456 行",
-  detail: "121 个文件 · 生产代码 + 测试代码 + 文档/静态资源",
+  value: "12,806 行",
+  detail: "133 个文件 · 生产代码 + 测试代码 + 文档/静态资源",
 } as const;

@@ -1,4 +1,6 @@
 from app.core.security import hash_password
+from datetime import datetime, timedelta, timezone
+
 from app.models import Executive, Tenant, TenantAdmin
 
 
@@ -54,3 +56,40 @@ def test_tenant_admin_can_list_and_approve_executives(client, db_session) -> Non
 
     assert approve_response.status_code == 200
     assert approve_response.json()["approval_status"] == "approved"
+
+
+def test_tenant_admin_can_create_and_list_lounge_events(client, db_session) -> None:
+    seed_tenant_and_pending_executive(db_session)
+
+    login_response = client.post(
+        "/api/v1/tenants/acme/admin/auth/login",
+        json={"username": "acme-admin", "password": "admin123456"},
+    )
+    assert login_response.status_code == 200
+    access_token = login_response.json()["access_token"]
+
+    now = datetime.now(timezone.utc)
+    create_response = client.post(
+        "/api/v1/tenants/acme/admin/lounge-events",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "title": "Friday Lounge",
+            "description": "Live anonymous session",
+            "ticket_open_at": (now + timedelta(minutes=10)).isoformat(),
+            "start_at": (now + timedelta(minutes=30)).isoformat(),
+            "end_at": (now + timedelta(minutes=90)).isoformat(),
+            "ticket_limit": 5,
+        },
+    )
+
+    assert create_response.status_code == 201
+    assert create_response.json()["title"] == "Friday Lounge"
+    assert create_response.json()["ticket_limit"] == 5
+
+    list_response = client.get(
+        "/api/v1/tenants/acme/admin/lounge-events",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert list_response.status_code == 200
+    assert list_response.json()["items"][0]["title"] == "Friday Lounge"

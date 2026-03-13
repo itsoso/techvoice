@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { claimLoungeTicket } from "../../api/lounge";
 import SiteChrome from "../../components/SiteChrome";
@@ -52,6 +52,14 @@ export default function LoungeTicketPage() {
             <p className="helper-copy storage-scope-note">
               该票据只保存在当前浏览器的 localStorage 中，不会同步到服务器或其他设备。
             </p>
+            <div className="form-footer">
+              <Link className="ghost-link" to={`/t/${tenantSlug}/lounge`}>
+                返回活动页
+              </Link>
+              <Link className="primary-button proposal-button" to={`/t/${tenantSlug}/lounge/${eventId}/room`}>
+                活动开始后进入会客厅
+              </Link>
+            </div>
           </section>
         ) : (
           <div className="form-footer">

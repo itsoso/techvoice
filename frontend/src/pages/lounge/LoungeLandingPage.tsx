@@ -3,11 +3,13 @@ import { Link, useParams } from "react-router-dom";
 
 import { getCurrentLoungeEvent, type LoungeEvent } from "../../api/lounge";
 import SiteChrome from "../../components/SiteChrome";
+import { getSavedLoungeTicket } from "../../lib/loungeTickets";
 
 export default function LoungeLandingPage() {
   const { tenantSlug = "" } = useParams();
   const [event, setEvent] = useState<LoungeEvent | null>(null);
   const [error, setError] = useState("");
+  const savedTicket = event ? getSavedLoungeTicket(tenantSlug, String(event.id)) : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -77,8 +79,27 @@ export default function LoungeLandingPage() {
 
           <div className="form-footer">
             <span className="helper-copy">本次活动按当前浏览器抢票和入场，不绑定真实员工身份。</span>
-            <Link className="primary-button proposal-button" to={`/t/${tenantSlug}/lounge/${event.id}/ticket`}>
-              进入抢票
+            <div className="hero-action-row">
+              {savedTicket ? (
+                <Link className="ghost-button" to={`/t/${tenantSlug}/lounge/${event.id}/room`}>
+                  进入会客厅
+                </Link>
+              ) : null}
+              <Link className="primary-button proposal-button" to={`/t/${tenantSlug}/lounge/${event.id}/ticket`}>
+                进入抢票
+              </Link>
+            </div>
+          </div>
+
+          <div className="aux-link-row">
+            <Link className="ghost-link" to={`/t/${tenantSlug}/executive/register`}>
+              高管注册
+            </Link>
+            <Link className="ghost-link" to={`/t/${tenantSlug}/executive/login`}>
+              高管登录
+            </Link>
+            <Link className="ghost-link" to={`/t/${tenantSlug}/admin/login`}>
+              租户管理
             </Link>
           </div>
         </section>

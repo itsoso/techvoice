@@ -497,6 +497,18 @@ a {
   gap: 16px;
 }
 
+.hero-action-row,
+.aux-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.aux-link-row {
+  margin-top: 18px;
+}
+
 .primary-button {
   border: 0;
   border-radius: 999px;
@@ -694,6 +706,104 @@ a {
   display: grid;
   gap: 18px;
   margin-top: 18px;
+}
+
+.lounge-admin-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lounge-room-layout,
+.lounge-console-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+}
+
+.queue-panel,
+.lounge-chat-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.chat-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.chat-panel-header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+  letter-spacing: -0.03em;
+}
+
+.chat-panel-header p {
+  margin: 8px 0 0;
+  color: var(--text-soft);
+}
+
+.queue-list,
+.claimed-session-tabs,
+.chat-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.claimed-session-tabs {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.claimed-session-chip-active {
+  border-color: rgba(119, 214, 255, 0.34);
+  background: rgba(119, 214, 255, 0.12);
+}
+
+.queue-item-card,
+.chat-empty-state,
+.chat-message-card {
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(143, 170, 204, 0.18);
+  background: var(--surface-soft);
+}
+
+.queue-item-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.queue-item-card strong,
+.chat-message-card strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.chat-empty-state p,
+.chat-message-card p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.chat-message-participant {
+  border-color: rgba(119, 214, 255, 0.2);
+}
+
+.chat-message-executive {
+  border-color: rgba(108, 231, 178, 0.2);
+}
+
+.chat-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .detail-copy {
@@ -1064,6 +1174,12 @@ a {
   }
 
   .wall-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lounge-room-layout,
+  .lounge-console-grid,
+  .lounge-admin-form-grid {
     grid-template-columns: 1fr;
   }
 

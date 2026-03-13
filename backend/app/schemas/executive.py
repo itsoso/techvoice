@@ -32,5 +32,13 @@ class ExecutiveListResponse(BaseModel):
     items: list[ExecutiveRead]
 
 
+class QueueItemRead(BaseModel):
+    session_id: int
+    event_id: int
+    alias_label: str
+    entered_at: datetime | None
+    created_at: datetime
+
+
 class QueueListResponse(BaseModel):
-    items: list[dict]
+    items: list[QueueItemRead]

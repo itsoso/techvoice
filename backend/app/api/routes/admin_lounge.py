@@ -7,6 +7,8 @@ from app.db.session import get_db
 from app.models import TenantAdmin
 from app.schemas.admin import AdminLoginRequest, TokenResponse
 from app.schemas.executive import ExecutiveListResponse, ExecutiveRead
+from app.schemas.lounge import LoungeEventCreateRequest, LoungeEventListResponse, LoungeEventRead
+from app.services.lounge_service import create_lounge_event, list_lounge_events_for_tenant
 from app.services.tenant_admin_service import approve_executive, authenticate_tenant_admin, list_tenant_executives
 
 router = APIRouter(tags=["admin-lounge"])
@@ -49,3 +51,28 @@ def approve_tenant_executive_route(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="tenant mismatch")
     executive = approve_executive(db, admin.tenant_id, executive_id)
     return ExecutiveRead.model_validate(executive)
+
+
+@router.get("/tenants/{tenant_slug}/admin/lounge-events", response_model=LoungeEventListResponse)
+def list_lounge_events_route(
+    tenant_slug: str,
+    admin: TenantAdmin = Depends(get_current_tenant_admin),
+    db: Session = Depends(get_db),
+) -> LoungeEventListResponse:
+    if admin.tenant.slug != tenant_slug:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="tenant mismatch")
+    items = list_lounge_events_for_tenant(db, admin.tenant_id)
+    return LoungeEventListResponse(items=[LoungeEventRead.model_validate(item) for item in items])
+
+
+@router.post("/tenants/{tenant_slug}/admin/lounge-events", response_model=LoungeEventRead, status_code=201)
+def create_lounge_event_route(
+    tenant_slug: str,
+    payload: LoungeEventCreateRequest,
+    admin: TenantAdmin = Depends(get_current_tenant_admin),
+    db: Session = Depends(get_db),
+) -> LoungeEventRead:
+    if admin.tenant.slug != tenant_slug:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="tenant mismatch")
+    event = create_lounge_event(db, admin, payload)
+    return LoungeEventRead.model_validate(event)
