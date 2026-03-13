@@ -1,0 +1,26 @@
+[project]
+name = "techvoice-backend"
+version = "0.1.0"
+description = "TechVoice backend"
+requires-python = ">=3.13"
+dependencies = [
+  "bcrypt>=5.0.0,<6.0.0",
+  "fastapi>=0.116.1,<0.117.0",
+  "httpx>=0.28.1,<0.29.0",
+  "pydantic-settings>=2.11.0,<3.0.0",
+  "pyjwt>=2.12.0,<3.0.0",
+  "pytest>=8.4.1,<9.0.0",
+  "sqlalchemy>=2.0.43,<3.0.0",
+  "uvicorn>=0.35.0,<0.36.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["app/tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

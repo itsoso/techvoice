@@ -1,0 +1,71 @@
+from fastapi.testclient import TestClient
+
+
+def admin_headers(client: TestClient) -> dict[str, str]:
+    login_response = client.post(
+        "/api/v1/admin/auth/login",
+        json={"username": "admin", "password": "admin123456"},
+    )
+    assert login_response.status_code == 200
+    return {"Authorization": f"Bearer {login_response.json()['access_token']}"}
+
+
+def create_feedback(client: TestClient) -> None:
+    response = client.post(
+        "/api/v1/feedbacks",
+        json={
+            "type": "vent",
+            "category": "engineering_process",
+            "content_markdown": "需要管理员处理的反馈。",
+        },
+    )
+    assert response.status_code == 201
+
+
+def test_admin_list_feedbacks_returns_created_feedback(
+    client: TestClient,
+    seeded_admin,
+) -> None:
+    create_feedback(client)
+
+    response = client.get("/api/v1/admin/feedbacks", headers=admin_headers(client))
+
+    assert response.status_code == 200
+    assert len(response.json()["items"]) == 1
+
+
+def test_admin_can_update_feedback_status(client: TestClient, seeded_admin) -> None:
+    create_feedback(client)
+    listing = client.get("/api/v1/admin/feedbacks", headers=admin_headers(client))
+    feedback_id = listing.json()["items"][0]["id"]
+
+    response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/status",
+        json={"status": "accepted", "reason": "排入下一阶段优化"},
+        headers=admin_headers(client),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "accepted"
+
+
+def test_admin_can_reply_to_feedback(client: TestClient, seeded_admin) -> None:
+    create_feedback(client)
+    listing = client.get("/api/v1/admin/feedbacks", headers=admin_headers(client))
+    feedback_id = listing.json()["items"][0]["id"]
+
+    reply_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/reply",
+        json={"content": "我们已经收到，正在评估。"},
+        headers=admin_headers(client),
+    )
+
+    assert reply_response.status_code == 201
+
+    detail = client.get(
+        f"/api/v1/admin/feedbacks/{feedback_id}",
+        headers=admin_headers(client),
+    )
+
+    assert detail.status_code == 200
+    assert detail.json()["events"][-1]["actor_type"] == "admin"
