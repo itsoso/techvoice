@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { getAdminEntryLink } from "../api/admin";
+import { clearAdminToken, getAdminEntryLink, getAdminToken } from "../api/admin";
 import {
   applyThemePreference,
   readThemePreference,
@@ -55,12 +55,16 @@ function isActivePath(
 
 export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [themePreference, setThemePreference] = useState<ThemePreference>(() => readThemePreference());
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => Boolean(getAdminToken()));
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const isArchitecturePage =
     location.pathname === "/architecture" || location.pathname.startsWith("/architecture/");
-  const adminEntry = getAdminEntryLink();
+  const adminEntry = isAdminLoggedIn
+    ? { label: "管理员", to: "/admin/feedbacks" }
+    : getAdminEntryLink();
   const navItems = [
     ...BASE_NAV_ITEMS,
     {
@@ -117,6 +121,12 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
     setMenuOpen(false);
   }
 
+  function handleAdminLogout() {
+    clearAdminToken();
+    setIsAdminLoggedIn(false);
+    navigate("/admin/login");
+  }
+
   return (
     <header className="site-chrome">
       <div className="site-nav-row">
@@ -135,6 +145,11 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
           ))}
         </nav>
         <div className="site-utility-row">
+          {isAdminLoggedIn ? (
+            <button className="admin-logout-button" onClick={handleAdminLogout} type="button">
+              退出
+            </button>
+          ) : null}
           <div className="display-menu-shell" ref={menuRef}>
             <button
               aria-label={`显示设置，当前${displayLabel}`}

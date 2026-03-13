@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 
 import SiteChrome from "./SiteChrome";
+import { clearAdminToken, setAdminToken } from "../api/admin";
 
 function mockMatchMedia(matches: boolean) {
   vi.stubGlobal(
@@ -16,6 +17,7 @@ function mockMatchMedia(matches: boolean) {
 }
 
 afterEach(() => {
+  clearAdminToken();
   localStorage.clear();
   document.documentElement.removeAttribute("data-theme");
   vi.unstubAllGlobals();
@@ -67,4 +69,29 @@ it("opens the display menu for theme changes and architecture navigation", async
 
   expect(document.documentElement.dataset.theme).toBe("light");
   expect(localStorage.getItem("techvoice-theme-preference")).toBe("light");
+});
+
+it("shows logout for authenticated admins and clears the token", async () => {
+  mockMatchMedia(true);
+  setAdminToken("token-123");
+  const user = userEvent.setup();
+
+  render(
+    <MemoryRouter initialEntries={["/admin/feedbacks"]}>
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "管理员看板" },
+        ]}
+      />
+    </MemoryRouter>,
+  );
+
+  expect(screen.getByRole("link", { name: "管理员" })).toHaveAttribute("href", "/admin/feedbacks");
+  expect(screen.getByRole("button", { name: "退出" })).toBeInTheDocument();
+
+  await user.click(screen.getByRole("button", { name: "退出" }));
+
+  expect(localStorage.getItem("techvoice-admin-token")).toBeNull();
+  expect(screen.getByRole("link", { name: "管理员登录" })).toHaveAttribute("href", "/admin/login");
 });
