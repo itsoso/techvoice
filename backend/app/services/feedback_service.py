@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.enums import ActorType, EventType, FeedbackStatus
@@ -79,8 +79,38 @@ def create_employee_reply(db: Session, thread_code: str, payload: FeedbackReplyC
     return feedback
 
 
-def list_feedbacks(db: Session) -> list[Feedback]:
-    return list(db.scalars(select(Feedback).order_by(Feedback.created_at.desc())).all())
+def list_feedbacks(
+    db: Session,
+    *,
+    tab: str = "unreplied",
+    status_filter: FeedbackStatus | None = None,
+    page: int = 1,
+    page_size: int = 10,
+) -> tuple[list[Feedback], int]:
+    admin_reply_exists = (
+        select(FeedbackEvent.id)
+        .where(
+            FeedbackEvent.feedback_id == Feedback.id,
+            FeedbackEvent.actor_type == ActorType.ADMIN,
+            FeedbackEvent.event_type == EventType.REPLY,
+        )
+        .exists()
+    )
+    unreplied_condition = and_(Feedback.status == FeedbackStatus.RECEIVED, ~admin_reply_exists)
+    processed_condition = or_(Feedback.status != FeedbackStatus.RECEIVED, admin_reply_exists)
+
+    filters = [processed_condition if tab == "processed" else unreplied_condition]
+    if status_filter is not None:
+        filters.append(Feedback.status == status_filter)
+
+    base_query = select(Feedback).where(*filters)
+    total = db.scalar(select(func.count()).select_from(base_query.subquery())) or 0
+    items = list(
+        db.scalars(
+            base_query.order_by(Feedback.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
+        ).all()
+    )
+    return items, total
 
 
 def get_feedback_by_id(db: Session, feedback_id: int) -> Feedback:

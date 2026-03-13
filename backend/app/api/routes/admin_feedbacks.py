@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends
+from typing import Literal
+
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_admin
 from app.db.session import get_db
 from app.models.admin import Admin
+from app.models.enums import FeedbackStatus
 from app.schemas.feedback import (
     AdminReplyCreate,
     FeedbackDetail,
@@ -27,11 +30,26 @@ router = APIRouter(tags=["admin-feedbacks"])
 
 @router.get("/admin/feedbacks", response_model=FeedbackListResponse)
 def list_feedbacks_route(
+    tab: Literal["unreplied", "processed"] = Query("unreplied"),
+    status_filter: Literal["all", "received", "reviewing", "needs_info", "accepted", "deferred", "published", "hidden"] = Query("all", alias="status"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=50),
     _: Admin = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> FeedbackListResponse:
-    items = list_feedbacks(db)
-    return FeedbackListResponse(items=[FeedbackSummaryRead.model_validate(item) for item in items])
+    items, total = list_feedbacks(
+        db,
+        tab=tab,
+        status_filter=None if status_filter == "all" else FeedbackStatus(status_filter),
+        page=page,
+        page_size=page_size,
+    )
+    return FeedbackListResponse(
+        items=[FeedbackSummaryRead.model_validate(item) for item in items],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @router.post("/admin/feedbacks/{feedback_id}/status", response_model=FeedbackSummaryRead)

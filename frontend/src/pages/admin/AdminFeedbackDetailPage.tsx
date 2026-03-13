@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
   clearAdminToken,
@@ -14,16 +14,27 @@ import {
 } from "../../api/admin";
 import SiteChrome from "../../components/SiteChrome";
 import type { FeedbackDetail, TimelineEvent } from "../../api/feedbacks";
+import { buildAdminFeedbackListSearch, parseAdminFeedbackListSearch } from "../../lib/adminFeedbackList";
+
+function hasAdminReply(feedback: FeedbackDetail) {
+  return feedback.events.some((event) => event.actor_type === "admin" && event.event_type === "reply");
+}
+
+function isProcessedFeedback(feedback: FeedbackDetail) {
+  return feedback.status !== "received" || hasAdminReply(feedback);
+}
 
 export default function AdminFeedbackDetailPage() {
   const { feedbackId = "" } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [feedback, setFeedback] = useState<FeedbackDetail | null>(null);
   const [reply, setReply] = useState("");
   const [status, setStatus] = useState("reviewing");
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [forceProcessedReturn, setForceProcessedReturn] = useState(false);
 
   async function refresh() {
     const response = await getAdminFeedback(feedbackId);
@@ -54,6 +65,23 @@ export default function AdminFeedbackDetailPage() {
       };
     });
   }
+
+  const listSearch = (() => {
+    if (forceProcessedReturn) {
+      return buildAdminFeedbackListSearch({ tab: "processed", status: "all", page: 1 });
+    }
+
+    if (location.search) {
+      return location.search;
+    }
+
+    if (feedback && isProcessedFeedback(feedback)) {
+      return buildAdminFeedbackListSearch({ tab: "processed", status: "all", page: 1 });
+    }
+
+    const parsed = parseAdminFeedbackListSearch("");
+    return buildAdminFeedbackListSearch(parsed);
+  })();
 
   useEffect(() => {
     if (!getAdminToken()) {
@@ -92,6 +120,7 @@ export default function AdminFeedbackDetailPage() {
         created_at: new Date().toISOString(),
       });
       setReply("");
+      setForceProcessedReturn(true);
     } catch (replyError) {
       if (isAdminAuthError(replyError)) {
         redirectToLogin();
@@ -109,6 +138,7 @@ export default function AdminFeedbackDetailPage() {
     try {
       await updateAdminFeedbackStatus(feedbackId, status, reason.trim());
       await refresh();
+      setForceProcessedReturn(true);
       setSuccess("状态已更新。");
     } catch (statusError) {
       if (isAdminAuthError(statusError)) {
@@ -155,6 +185,7 @@ export default function AdminFeedbackDetailPage() {
         };
       });
       setStatus(published.status);
+      setForceProcessedReturn(true);
       setSuccess("已发布到回音壁。");
     } catch (publishError) {
       if (isAdminAuthError(publishError)) {
@@ -196,6 +227,7 @@ export default function AdminFeedbackDetailPage() {
         };
       });
       setStatus(hidden.status);
+      setForceProcessedReturn(true);
       setSuccess("已从回音壁撤回。");
     } catch (hideError) {
       if (isAdminAuthError(hideError)) {
@@ -237,6 +269,7 @@ export default function AdminFeedbackDetailPage() {
         };
       });
       setStatus(restored.status);
+      setForceProcessedReturn(true);
       setSuccess("已恢复到回音壁。");
     } catch (restoreError) {
       if (isAdminAuthError(restoreError)) {
@@ -253,14 +286,14 @@ export default function AdminFeedbackDetailPage() {
       <SiteChrome
         breadcrumbs={[
           { label: "首页", to: "/" },
-          { label: "管理员看板", to: "/admin/feedbacks" },
+          { label: "管理员看板", to: `/admin/feedbacks${listSearch}` },
           { label: "反馈详情" },
         ]}
       />
 
       <section className="form-panel">
         <div className="panel-header">
-          <Link className="ghost-link" to="/admin/feedbacks">
+          <Link className="ghost-link" to={`/admin/feedbacks${listSearch}`}>
             返回列表
           </Link>
           <h1>反馈详情</h1>

@@ -343,3 +343,57 @@ it("lets admins withdraw and restore a wall item from the detail page", async ()
   expect(screen.getByRole("button", { name: "撤回回音壁" })).toBeInTheDocument();
   expect(screen.getByText("已恢复公开到回音壁")).toBeInTheDocument();
 });
+
+it("returns processed feedback to the processed tab when no list query is present", async () => {
+  vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    new Response(
+      JSON.stringify({
+        thread_code: "ECH-657991",
+        public_code: "PUB-81C8D3",
+        type: "vent",
+        category: "collaboration",
+        status: "accepted",
+        is_public: false,
+        star_count: 0,
+        title: null,
+        content_markdown: "测试一下",
+        proposal_problem: null,
+        proposal_impact: null,
+        proposal_suggestion: null,
+        created_at: "2026-03-13T06:10:41.667054",
+        updated_at: "2026-03-13T06:10:41.667058",
+        events: [
+          {
+            actor_type: "system",
+            event_type: "submitted",
+            content: "你的声音已加密送达",
+            meta_json: null,
+            created_at: "2026-03-13T06:10:41.667911",
+          },
+        ],
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    ),
+  );
+
+  localStorage.setItem("techvoice-admin-token", "demo-token");
+
+  render(
+    <MemoryRouter initialEntries={["/admin/feedbacks/2"]}>
+      <Routes>
+        <Route path="/admin/feedbacks/:feedbackId" element={<AdminFeedbackDetailPage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+
+  expect(await screen.findByText("ECH-657991")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "返回列表" })).toHaveAttribute(
+    "href",
+    "/admin/feedbacks?tab=processed&status=all&page=1",
+  );
+});

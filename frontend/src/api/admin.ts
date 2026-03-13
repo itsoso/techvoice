@@ -1,5 +1,6 @@
 import { ApiError, apiRequest } from "./client";
 import type { FeedbackDetail } from "./feedbacks";
+import type { AdminFeedbackStatusFilter, AdminFeedbackTab } from "../lib/adminFeedbackList";
 
 const ADMIN_TOKEN_KEY = "techvoice-admin-token";
 
@@ -15,6 +16,13 @@ export type AdminFeedbackSummary = {
   title: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type AdminFeedbackListResponse = {
+  items: AdminFeedbackSummary[];
+  total: number;
+  page: number;
+  page_size: number;
 };
 
 function authHeaders() {
@@ -62,8 +70,29 @@ export async function adminLogin(username: string, password: string) {
   });
 }
 
-export async function listAdminFeedbacks() {
-  return apiRequest<{ items: AdminFeedbackSummary[] }>("/admin/feedbacks", {
+export async function listAdminFeedbacks(params?: {
+  tab?: AdminFeedbackTab;
+  status?: AdminFeedbackStatusFilter;
+  page?: number;
+  pageSize?: number;
+}) {
+  const search = new URLSearchParams();
+  if (params?.tab) {
+    search.set("tab", params.tab);
+  }
+  if (params?.status) {
+    search.set("status", params.status);
+  }
+  if (params?.page) {
+    search.set("page", String(params.page));
+  }
+  if (params?.pageSize) {
+    search.set("page_size", String(params.pageSize));
+  }
+
+  const query = search.toString();
+
+  return apiRequest<AdminFeedbackListResponse>(`/admin/feedbacks${query ? `?${query}` : ""}`, {
     headers: authHeaders(),
   });
 }

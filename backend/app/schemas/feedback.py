@@ -102,6 +102,9 @@ class FeedbackSummaryRead(BaseModel):
 
 class FeedbackListResponse(BaseModel):
     items: list[FeedbackSummaryRead]
+    total: int
+    page: int
+    page_size: int
 
 
 class FeedbackStatusUpdate(BaseModel):
