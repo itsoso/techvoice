@@ -96,3 +96,20 @@ it("shows logout for authenticated admins and clears the token", async () => {
   expect(localStorage.getItem("techvoice-admin-token")).toBeNull();
   expect(screen.getByRole("link", { name: "管理员登录" })).toHaveAttribute("href", "/admin/login");
 });
+
+it("shows a tenant lounge entry when browsing tenant-scoped pages", () => {
+  mockMatchMedia(true);
+
+  render(
+    <MemoryRouter initialEntries={["/t/kuaishou/admin/login"]}>
+      <SiteChrome
+        breadcrumbs={[
+          { label: "首页", to: "/" },
+          { label: "租户管理登录" },
+        ]}
+      />
+    </MemoryRouter>,
+  );
+
+  expect(screen.getByRole("link", { name: "会客厅" })).toHaveAttribute("href", "/t/kuaishou/lounge");
+});

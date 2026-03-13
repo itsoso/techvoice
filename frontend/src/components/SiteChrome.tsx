@@ -53,6 +53,24 @@ function isActivePath(
   return item.prefixes?.some((prefix) => pathname.startsWith(prefix)) ?? false;
 }
 
+function getTenantScopedNavItem(pathname: string) {
+  const matched = pathname.match(/^\/t\/([^/]+)(?:\/|$)/);
+  if (!matched) {
+    return null;
+  }
+
+  const tenantSlug = matched[1];
+  return {
+    label: "会客厅",
+    to: `/t/${tenantSlug}/lounge`,
+    prefixes: [
+      `/t/${tenantSlug}/lounge`,
+      `/t/${tenantSlug}/executive`,
+      `/t/${tenantSlug}/admin`,
+    ] as const,
+  };
+}
+
 export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,8 +85,10 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const adminEntry = isAdminLoggedIn
     ? { label: "管理员", to: "/admin/feedbacks" }
     : getAdminEntryLink();
+  const tenantNavItem = getTenantScopedNavItem(location.pathname);
   const navItems = [
     ...BASE_NAV_ITEMS,
+    ...(tenantNavItem ? [tenantNavItem] : []),
     {
       label: adminEntry.label,
       to: adminEntry.to,
