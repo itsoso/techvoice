@@ -585,6 +585,22 @@ a {
   cursor: not-allowed;
 }
 
+.wall-action-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-wall-action {
+  border-color: rgba(255, 103, 103, 0.2);
+  color: #ffb8b8;
+}
+
+.admin-wall-action:hover {
+  border-color: rgba(255, 103, 103, 0.34);
+  background: rgba(255, 103, 103, 0.08);
+}
+
 .status-pill-row {
   display: flex;
   gap: 12px;

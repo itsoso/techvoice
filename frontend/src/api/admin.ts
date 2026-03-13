@@ -96,3 +96,24 @@ export async function publishAdminFeedback(feedbackId: string) {
     headers: authHeaders(),
   });
 }
+
+export async function hideAdminFeedback(feedbackId: string) {
+  return apiRequest<AdminFeedbackSummary>(`/admin/feedbacks/${feedbackId}/hide`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+}
+
+export async function hideAdminPublicFeedback(publicCode: string) {
+  return apiRequest<AdminFeedbackSummary>(`/admin/public-feedbacks/${publicCode}/hide`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+}
+
+export async function restoreAdminFeedback(feedbackId: string) {
+  return apiRequest<AdminFeedbackSummary>(`/admin/feedbacks/${feedbackId}/restore`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+}

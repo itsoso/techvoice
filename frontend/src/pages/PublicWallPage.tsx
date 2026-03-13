@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { clearAdminToken, getAdminToken, hideAdminPublicFeedback, isAdminAuthError } from "../api/admin";
 import { listPublicFeedbacks, starPublicFeedback, type PublicFeedback } from "../api/feedbacks";
 import SiteChrome from "../components/SiteChrome";
 
@@ -49,6 +50,8 @@ function renderVentContent(item: PublicFeedback) {
 export default function PublicWallPage() {
   const [items, setItems] = useState<PublicFeedback[]>([]);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [canManageWall, setCanManageWall] = useState(() => Boolean(getAdminToken()));
 
   useEffect(() => {
     let cancelled = false;
@@ -82,6 +85,26 @@ export default function PublicWallPage() {
     );
   }
 
+  async function handleHide(publicCode: string) {
+    setError("");
+    setSuccess("");
+
+    try {
+      await hideAdminPublicFeedback(publicCode);
+      setItems((current) => current.filter((item) => item.public_code !== publicCode));
+      setSuccess("已从回音壁撤回。");
+    } catch (hideError) {
+      if (isAdminAuthError(hideError)) {
+        clearAdminToken();
+        setCanManageWall(false);
+        setError("管理员登录已失效，请重新登录后再试。");
+        return;
+      }
+
+      setError(hideError instanceof Error ? hideError.message : "撤回失败，请稍后重试。");
+    }
+  }
+
   return (
     <main className="page-shell">
       <SiteChrome
@@ -98,6 +121,11 @@ export default function PublicWallPage() {
       </section>
 
       {error ? <p className="error-banner">{error}</p> : null}
+      {success ? (
+        <p aria-live="polite" className="success-banner" role="status">
+          {success}
+        </p>
+      ) : null}
 
       <section className="wall-grid">
         {items.map((item) => {
@@ -132,9 +160,20 @@ export default function PublicWallPage() {
               ) : null}
               <div className="form-footer">
                 <span className="helper-copy">{item.star_count} Stars</span>
-                <button className="ghost-button" onClick={() => void handleStar(item.public_code)} type="button">
-                  Star
-                </button>
+                <div className="wall-action-row">
+                  {canManageWall ? (
+                    <button
+                      className="ghost-button admin-wall-action"
+                      onClick={() => void handleHide(item.public_code)}
+                      type="button"
+                    >
+                      撤回
+                    </button>
+                  ) : null}
+                  <button className="ghost-button" onClick={() => void handleStar(item.public_code)} type="button">
+                    Star
+                  </button>
+                </div>
               </div>
             </article>
           );

@@ -13,6 +13,7 @@ class FeedbackStatus(StrEnum):
     ACCEPTED = "accepted"
     DEFERRED = "deferred"
     PUBLISHED = "published"
+    HIDDEN = "hidden"
 
 
 class ActorType(StrEnum):
@@ -26,4 +27,6 @@ class EventType(StrEnum):
     STATUS_CHANGED = "status_changed"
     REPLY = "reply"
     PUBLISHED = "published"
+    HIDDEN = "hidden"
+    RESTORED = "restored"
     STARRED = "starred"

@@ -94,6 +94,17 @@ def get_feedback_by_id(db: Session, feedback_id: int) -> Feedback:
     return feedback
 
 
+def get_feedback_by_public_code(db: Session, public_code: str) -> Feedback:
+    feedback = db.scalar(
+        select(Feedback)
+        .options(selectinload(Feedback.events))
+        .where(Feedback.public_code == public_code)
+    )
+    if feedback is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="feedback not found")
+    return feedback
+
+
 def update_feedback_status(db: Session, feedback_id: int, payload: FeedbackStatusUpdate) -> Feedback:
     feedback = get_feedback_by_id(db, feedback_id)
     feedback.status = payload.status
@@ -138,6 +149,47 @@ def publish_feedback(db: Session, feedback_id: int) -> Feedback:
             actor_type=ActorType.ADMIN,
             event_type=EventType.PUBLISHED,
             content="已公开到回音壁",
+        )
+    )
+    db.commit()
+    db.refresh(feedback)
+    return feedback
+
+
+def hide_feedback(db: Session, feedback_id: int) -> Feedback:
+    feedback = get_feedback_by_id(db, feedback_id)
+    feedback.is_public = False
+    feedback.status = FeedbackStatus.HIDDEN
+    db.add(
+        FeedbackEvent(
+            feedback_id=feedback.id,
+            actor_type=ActorType.ADMIN,
+            event_type=EventType.HIDDEN,
+            content="已从回音壁撤回",
+        )
+    )
+    db.commit()
+    db.refresh(feedback)
+    return feedback
+
+
+def hide_feedback_by_public_code(db: Session, public_code: str) -> Feedback:
+    feedback = get_feedback_by_public_code(db, public_code)
+    if not feedback.is_public:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="feedback is already hidden")
+    return hide_feedback(db, feedback.id)
+
+
+def restore_feedback(db: Session, feedback_id: int) -> Feedback:
+    feedback = get_feedback_by_id(db, feedback_id)
+    feedback.is_public = True
+    feedback.status = FeedbackStatus.PUBLISHED
+    db.add(
+        FeedbackEvent(
+            feedback_id=feedback.id,
+            actor_type=ActorType.ADMIN,
+            event_type=EventType.RESTORED,
+            content="已恢复公开到回音壁",
         )
     )
     db.commit()

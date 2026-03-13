@@ -67,6 +67,39 @@ def test_public_feedbacks_lists_published_items(client: TestClient, seeded_admin
     assert len(response.json()["items"]) == 1
 
 
+def test_hidden_feedbacks_are_removed_from_public_wall_until_restored(client: TestClient, seeded_admin) -> None:
+    feedback_id = create_feedback(client)
+    publish_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/publish",
+        headers=admin_headers(client),
+    )
+    assert publish_response.status_code == 200
+
+    hidden_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/hide",
+        headers=admin_headers(client),
+    )
+    assert hidden_response.status_code == 200
+    assert hidden_response.json()["status"] == "hidden"
+    assert hidden_response.json()["is_public"] is False
+
+    hidden_wall = client.get("/api/v1/public/feedbacks")
+    assert hidden_wall.status_code == 200
+    assert hidden_wall.json()["items"] == []
+
+    restore_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/restore",
+        headers=admin_headers(client),
+    )
+    assert restore_response.status_code == 200
+    assert restore_response.json()["status"] == "published"
+    assert restore_response.json()["is_public"] is True
+
+    restored_wall = client.get("/api/v1/public/feedbacks")
+    assert restored_wall.status_code == 200
+    assert len(restored_wall.json()["items"]) == 1
+
+
 def test_public_feedbacks_include_full_content_and_admin_replies(client: TestClient, seeded_admin) -> None:
     create_response = client.post(
         "/api/v1/feedbacks",

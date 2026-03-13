@@ -69,3 +69,38 @@ def test_admin_can_reply_to_feedback(client: TestClient, seeded_admin) -> None:
 
     assert detail.status_code == 200
     assert detail.json()["events"][-1]["actor_type"] == "admin"
+
+
+def test_admin_can_hide_and_restore_published_feedback(client: TestClient, seeded_admin) -> None:
+    create_feedback(client)
+    listing = client.get("/api/v1/admin/feedbacks", headers=admin_headers(client))
+    feedback_id = listing.json()["items"][0]["id"]
+
+    publish_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/publish",
+        headers=admin_headers(client),
+    )
+    assert publish_response.status_code == 200
+
+    hide_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/hide",
+        headers=admin_headers(client),
+    )
+    assert hide_response.status_code == 200
+    assert hide_response.json()["status"] == "hidden"
+    assert hide_response.json()["is_public"] is False
+
+    detail = client.get(
+        f"/api/v1/admin/feedbacks/{feedback_id}",
+        headers=admin_headers(client),
+    )
+    assert detail.status_code == 200
+    assert detail.json()["events"][-1]["content"] == "已从回音壁撤回"
+
+    restore_response = client.post(
+        f"/api/v1/admin/feedbacks/{feedback_id}/restore",
+        headers=admin_headers(client),
+    )
+    assert restore_response.status_code == 200
+    assert restore_response.json()["status"] == "published"
+    assert restore_response.json()["is_public"] is True

@@ -5,9 +5,11 @@ import {
   clearAdminToken,
   getAdminToken,
   getAdminFeedback,
+  hideAdminFeedback,
   isAdminAuthError,
   publishAdminFeedback,
   replyAdminFeedback,
+  restoreAdminFeedback,
   updateAdminFeedbackStatus,
 } from "../../api/admin";
 import SiteChrome from "../../components/SiteChrome";
@@ -164,6 +166,88 @@ export default function AdminFeedbackDetailPage() {
     }
   }
 
+  async function handleHide() {
+    setError("");
+    setSuccess("");
+
+    try {
+      const hidden = await hideAdminFeedback(feedbackId);
+      setFeedback((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          status: hidden.status,
+          is_public: hidden.is_public,
+          star_count: hidden.star_count,
+          updated_at: hidden.updated_at,
+          events: [
+            ...current.events,
+            {
+              actor_type: "admin",
+              event_type: "hidden",
+              content: "已从回音壁撤回",
+              meta_json: null,
+              created_at: hidden.updated_at,
+            },
+          ],
+        };
+      });
+      setStatus(hidden.status);
+      setSuccess("已从回音壁撤回。");
+    } catch (hideError) {
+      if (isAdminAuthError(hideError)) {
+        redirectToLogin();
+        return;
+      }
+
+      setError(getErrorMessage(hideError, "撤回失败，请稍后重试。"));
+    }
+  }
+
+  async function handleRestore() {
+    setError("");
+    setSuccess("");
+
+    try {
+      const restored = await restoreAdminFeedback(feedbackId);
+      setFeedback((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          status: restored.status,
+          is_public: restored.is_public,
+          star_count: restored.star_count,
+          updated_at: restored.updated_at,
+          events: [
+            ...current.events,
+            {
+              actor_type: "admin",
+              event_type: "restored",
+              content: "已恢复公开到回音壁",
+              meta_json: null,
+              created_at: restored.updated_at,
+            },
+          ],
+        };
+      });
+      setStatus(restored.status);
+      setSuccess("已恢复到回音壁。");
+    } catch (restoreError) {
+      if (isAdminAuthError(restoreError)) {
+        redirectToLogin();
+        return;
+      }
+
+      setError(getErrorMessage(restoreError, "恢复失败，请稍后重试。"));
+    }
+  }
+
   return (
     <main className="page-shell">
       <SiteChrome
@@ -249,6 +333,7 @@ export default function AdminFeedbackDetailPage() {
                   <option value="accepted">accepted</option>
                   <option value="deferred">deferred</option>
                   <option value="published">published</option>
+                  <option value="hidden">hidden</option>
                 </select>
               </label>
               <label className="field">
@@ -259,14 +344,19 @@ export default function AdminFeedbackDetailPage() {
                 <button className="primary-button vent-button" type="submit">
                   更新状态
                 </button>
-                <button
-                  className="ghost-button"
-                  disabled={feedback.is_public}
-                  onClick={() => void handlePublish()}
-                  type="button"
-                >
-                  {feedback.is_public ? "已发布到回音壁" : "发布到回音壁"}
-                </button>
+                {feedback.is_public ? (
+                  <button className="ghost-button" onClick={() => void handleHide()} type="button">
+                    撤回回音壁
+                  </button>
+                ) : feedback.status === "hidden" ? (
+                  <button className="ghost-button" onClick={() => void handleRestore()} type="button">
+                    恢复到回音壁
+                  </button>
+                ) : (
+                  <button className="ghost-button" onClick={() => void handlePublish()} type="button">
+                    发布到回音壁
+                  </button>
+                )}
               </div>
             </form>
           </>

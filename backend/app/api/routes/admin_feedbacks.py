@@ -14,8 +14,11 @@ from app.schemas.feedback import (
 from app.services.feedback_service import (
     create_admin_reply,
     get_feedback_by_id,
+    hide_feedback,
+    hide_feedback_by_public_code,
     list_feedbacks,
     publish_feedback,
+    restore_feedback,
     update_feedback_status,
 )
 
@@ -70,4 +73,34 @@ def publish_feedback_route(
     db: Session = Depends(get_db),
 ) -> FeedbackSummaryRead:
     feedback = publish_feedback(db, feedback_id)
+    return FeedbackSummaryRead.model_validate(feedback)
+
+
+@router.post("/admin/feedbacks/{feedback_id}/hide", response_model=FeedbackSummaryRead)
+def hide_feedback_route(
+    feedback_id: int,
+    _: Admin = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> FeedbackSummaryRead:
+    feedback = hide_feedback(db, feedback_id)
+    return FeedbackSummaryRead.model_validate(feedback)
+
+
+@router.post("/admin/public-feedbacks/{public_code}/hide", response_model=FeedbackSummaryRead)
+def hide_public_feedback_route(
+    public_code: str,
+    _: Admin = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> FeedbackSummaryRead:
+    feedback = hide_feedback_by_public_code(db, public_code)
+    return FeedbackSummaryRead.model_validate(feedback)
+
+
+@router.post("/admin/feedbacks/{feedback_id}/restore", response_model=FeedbackSummaryRead)
+def restore_feedback_route(
+    feedback_id: int,
+    _: Admin = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> FeedbackSummaryRead:
+    feedback = restore_feedback(db, feedback_id)
     return FeedbackSummaryRead.model_validate(feedback)
