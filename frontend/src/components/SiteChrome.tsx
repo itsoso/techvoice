@@ -50,6 +50,8 @@ function isActivePath(
 export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
   const location = useLocation();
   const [themePreference, setThemePreference] = useState<ThemePreference>(() => readThemePreference());
+  const isArchitecturePage =
+    location.pathname === "/architecture" || location.pathname.startsWith("/architecture/");
 
   useEffect(() => {
     applyThemePreference(themePreference);
@@ -81,7 +83,7 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
         <Link className="site-brand" to="/">
           Echo｜TechVoice
         </Link>
-        <div className="site-nav-tools">
+        <div className="site-nav-stack">
           <nav aria-label="主导航" className="site-nav">
             {NAV_ITEMS.map((item) => (
               <Link
@@ -93,18 +95,28 @@ export default function SiteChrome({ breadcrumbs }: SiteChromeProps) {
               </Link>
             ))}
           </nav>
-          <div aria-label="主题切换" className="theme-switcher" role="group">
-            {THEME_OPTIONS.map((option) => (
-              <button
-                aria-pressed={themePreference === option.value}
-                className={`theme-option${themePreference === option.value ? " theme-option-active" : ""}`}
-                key={option.value}
-                onClick={() => handleThemeChange(option.value)}
-                type="button"
+          <div className="site-utility-row">
+            <Link
+              className={`site-utility-link${isArchitecturePage ? " site-utility-link-active" : ""}`}
+              to="/architecture"
+            >
+              系统架构
+            </Link>
+            <label className="theme-select-shell">
+              <span className="theme-select-label">显示</span>
+              <select
+                aria-label="主题模式"
+                className="theme-select"
+                onChange={(event) => handleThemeChange(event.target.value as ThemePreference)}
+                value={themePreference}
               >
-                {option.label}
-              </button>
-            ))}
+                {THEME_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
       </div>

@@ -104,13 +104,13 @@ a {
   color: var(--text);
 }
 
-.site-nav-tools {
+.site-nav-stack {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: flex-end;
-  gap: 12px;
+  align-items: flex-end;
+  gap: 10px;
   flex: 1;
-  flex-wrap: wrap;
 }
 
 .site-nav {
@@ -143,35 +143,71 @@ a {
   background: rgba(119, 214, 255, 0.12);
 }
 
-.theme-switcher {
+.site-utility-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.site-utility-link {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--text-soft);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.site-utility-link:hover {
+  color: var(--text);
+  border-color: rgba(143, 170, 204, 0.24);
+}
+
+.site-utility-link-active {
+  color: var(--text);
+  background: rgba(119, 214, 255, 0.1);
+  border-color: rgba(119, 214, 255, 0.2);
+}
+
+.theme-select-shell {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
+  gap: 8px;
+  padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid var(--panel-border);
   background: var(--bg-soft);
 }
 
-.theme-option {
-  border: 0;
-  background: transparent;
+.theme-select-label {
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-soft);
-  padding: 8px 12px;
-  border-radius: 999px;
-  font: inherit;
-  cursor: pointer;
-  transition:
-    background 180ms ease,
-    color 180ms ease;
 }
 
-.theme-option:hover {
+.theme-select {
+  appearance: none;
+  border: 0;
+  padding: 0 18px 0 0;
+  min-width: 90px;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--text-soft) 50%) right 7px center / 6px 6px no-repeat,
+    linear-gradient(135deg, var(--text-soft) 50%, transparent 50%) right 2px center / 6px 6px no-repeat;
   color: var(--text);
+  font: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+  outline: none;
 }
 
-.theme-option-active {
-  background: var(--badge-bg);
+.theme-select:focus {
   color: var(--text);
 }
 
@@ -601,6 +637,77 @@ a {
   background: var(--surface-strong);
 }
 
+.architecture-stat-grid,
+.architecture-grid {
+  margin-top: 24px;
+  display: grid;
+  gap: 18px;
+}
+
+.architecture-stat-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.architecture-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.architecture-stat-card,
+.info-card {
+  border: 1px solid var(--panel-border);
+  background: linear-gradient(180deg, var(--panel-surface-top), var(--panel));
+  box-shadow: var(--shadow);
+}
+
+.architecture-stat-card {
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.architecture-stat-card strong {
+  display: block;
+  margin-top: 18px;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  letter-spacing: -0.04em;
+}
+
+.architecture-stat-card span {
+  display: block;
+  margin-top: 10px;
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.architecture-stat-card p:last-child {
+  margin: 8px 0 0;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.info-card {
+  padding: 26px;
+  border-radius: 28px;
+}
+
+.info-card h2 {
+  margin: 16px 0 12px;
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+}
+
+.info-card p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.bullet-list {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  line-height: 1.8;
+}
+
 @media (max-width: 760px) {
   .page-shell {
     width: min(100% - 24px, 1120px);
@@ -616,9 +723,8 @@ a {
     align-items: stretch;
   }
 
-  .site-nav-tools {
+  .site-nav-stack {
     width: 100%;
-    flex-direction: column;
     align-items: stretch;
   }
 
@@ -626,12 +732,18 @@ a {
     justify-content: flex-start;
   }
 
-  .theme-switcher {
+  .site-utility-row {
     width: 100%;
+    justify-content: space-between;
   }
 
-  .theme-option {
+  .theme-select-shell {
     flex: 1;
+    justify-content: space-between;
+  }
+
+  .theme-select {
+    min-width: 108px;
   }
 
   .card-grid {
@@ -639,6 +751,11 @@ a {
   }
 
   .wall-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .architecture-stat-grid,
+  .architecture-grid {
     grid-template-columns: 1fr;
   }
 }

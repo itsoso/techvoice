@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
+import ArchitecturePage from "./pages/ArchitecturePage";
 import ProposalSubmitPage from "./pages/ProposalSubmitPage";
 import PublicWallPage from "./pages/PublicWallPage";
 import SuccessPage from "./pages/SuccessPage";
@@ -17,6 +18,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/architecture" element={<ArchitecturePage />} />
         <Route path="/submit/vent" element={<VentSubmitPage />} />
         <Route path="/submit/proposal" element={<ProposalSubmitPage />} />
         <Route path="/success/:threadCode" element={<SuccessPage />} />

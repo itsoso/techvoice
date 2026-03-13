@@ -37,11 +37,12 @@ it("renders primary navigation and breadcrumbs", () => {
 
   expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "我要吐槽" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "系统架构" })).toBeInTheDocument();
   expect(screen.getByRole("navigation", { name: "面包屑" })).toBeInTheDocument();
   expect(screen.getByRole("navigation", { name: "面包屑" })).toHaveTextContent("查询追踪");
 });
 
-it("lets visitors switch theme from the top navigation", async () => {
+it("lets visitors switch theme from the compact theme selector", async () => {
   mockMatchMedia(true);
   const user = userEvent.setup();
 
@@ -56,7 +57,7 @@ it("lets visitors switch theme from the top navigation", async () => {
     </MemoryRouter>,
   );
 
-  await user.click(screen.getByRole("button", { name: "浅色" }));
+  await user.selectOptions(screen.getByRole("combobox", { name: "主题模式" }), "light");
 
   expect(document.documentElement.dataset.theme).toBe("light");
   expect(localStorage.getItem("techvoice-theme-preference")).toBe("light");
