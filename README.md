@@ -19,11 +19,6 @@ cd /Users/liqiuhua/work/techvoice/backend
 /Users/liqiuhua/work/techvoice/.venv/bin/python -m uvicorn app.main:app --reload
 ```
 
-默认管理员账号：
-
-- 用户名：`admin`
-- 密码：`admin123456`
-
 匿名会客厅新增的多租户与活动配置目前通过租户管理员接口维护，默认生产 seed 仍只创建全局管理员账号。
 
 如需正式初始化某个租户和会客厅活动，使用下面的 bootstrap 脚本：
